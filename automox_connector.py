@@ -1,6 +1,6 @@
 import json
 import re
-from typing import Any, Collection
+from typing import Any, Collection, Dict, Tuple
 from urllib.parse import quote, urlencode
 
 import phantom.app as phantom
@@ -16,6 +16,24 @@ class RetVal(tuple):
 
     def __new__(cls, val1, val2=None):
         return tuple.__new__(RetVal, (val1, val2))
+
+
+class Params:
+    def __init__(self, query_params: Dict[str, str] = {}, path_params: Dict[str, str] = {}):
+        self.query_params = query_params
+        self.path_params = path_params
+
+    def build_params_string(self) -> Tuple[str, str]:
+        query_string = urlencode(self.query_params)
+        path_string = "/".join(f"{key}/{quote(str(value))}" for key, value in self.path_params.items())
+        return query_string, path_string
+
+
+class AutomoxAction:
+    def __init__(self, base_endpoint: str, params: Params, summary_key: str = None):
+        self.base_endpoint = base_endpoint
+        self.params = params
+        self.summary_key = summary_key
 
 
 class AutomoxConnector(BaseConnector):
@@ -255,16 +273,17 @@ class AutomoxConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _handle_list_policies(self, param):
+    def _handle_list_polices(self, action: AutomoxAction, **kwargs):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
-        action_result = self.add_action_result(ActionResult(dict(param)))
+        action_result = self.add_action_result(ActionResult(action.param))
 
-        base_endpoint = AUTOMOX_POLICY_LIST_ENDPOINT
-        path_params = None
-        query_params = {"o": param.get("org_id")}
-
-        all_policies, ret_val = self._fetch_paginated_data(base_endpoint, path_params, query_params, action_result)
+        all_policies, ret_val = self._fetch_paginated_data(
+            base_endpoint=action.base_endpoint,
+            path_params=action.params.path_params,
+            query_params=action.params.query_params,
+            action_result=action_result,
+        )
 
         if phantom.is_fail(ret_val):
             return action_result.get_status()
@@ -272,7 +291,7 @@ class AutomoxConnector(BaseConnector):
         action_result.add_data(all_policies)
 
         summary = action_result.update_summary({})
-        summary["total_policies"] = len(all_policies)
+        summary[action.summary_key] = len(all_policies)
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
