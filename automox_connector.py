@@ -166,7 +166,7 @@ class AutomoxConnector(BaseConnector):
             if len(response) < self._page_limit:
                 break
 
-            self.next_page(pagination_params)
+            pagination_params = self.next_page(pagination_params)
 
         return all_items, phantom.APP_SUCCESS
 
@@ -177,8 +177,10 @@ class AutomoxConnector(BaseConnector):
         return params
 
     @staticmethod
-    def next_page(params: dict) -> None:
-        params["page"] += 1
+    def next_page(params: dict) -> dict:
+        new_params = params.copy()
+        new_params["page"] += 1
+        return new_params
 
     @staticmethod
     def _is_value_or_number(value: Any) -> bool:
@@ -406,7 +408,7 @@ class AutomoxConnector(BaseConnector):
             if len(devices) < params["limit"]:
                 break
 
-            self.next_page(params)
+            params = self.next_page(params)
 
         self.debug_print(f"Device {value} not found")
         return {}
