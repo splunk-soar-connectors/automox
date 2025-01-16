@@ -610,59 +610,46 @@ class AutomoxConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def handle_action(self, param):
-        ret_val = phantom.APP_SUCCESS
-
         # Get the action that we are supposed to execute for this App Run
-        action_id = self.get_action_identifier()
+        self.debug_print("action_id ", self.get_action_identifier())
 
-        self.debug_print("action_id", self.get_action_identifier())
+        if self.get_action_identifier() == phantom.ACTION_ID_INGEST_ON_POLL:
+            start_time = time.time()
+            result = self._on_poll(param)
+            end_time = time.time()
+            diff_time = end_time - start_time
+            human_time = str(timedelta(seconds=int(diff_time)))
+            self.save_progress("Time taken: {0}".format(human_time))
 
-        if action_id == "run_worklet":
-            ret_val = self._handle_run_worklet(param)
+            return result
 
-        if action_id == "list_policies":
-            ret_val = self._handle_list_policies(param)
+        action_mapping = {
+            "test_asset_connectivity": self._handle_test_connectivity,
+            "list_groups": self._handle_list_groups,
+            "run_policy": self._handle_run_worklet,
+            "list_policies": self._handle_list_policies,
+            "list_organizations": self._handle_list_organizations,
+            "list_organization_users": self._handle_list_organization_users,
+            "list_devices": self._handle_list_devices,
+            "get_device": self._handle_get_device,
+            "get_device_by_hostname": self._handle_get_device_by_hostname,
+            "get_device_by_ip_address": self._handle_get_device_by_ip_address,
+            "get_device_software": self._handle_get_device_software,
+            "get_command_queues": self._handle_get_command_queues,
+            "remove_user_from_account": self._handle_remove_user_from_account,
+            "update_device": self._handle_update_device,
+            "delete_device": self._handle_delete_device,
+        }
 
-        if action_id == "list_devices":
-            ret_val = self._handle_list_devices(param)
+        action = self.get_action_identifier()
+        action_execution_status = phantom.APP_SUCCESS
 
-        if action_id == "list_organizations":
-            ret_val = self._handle_list_organizations(param)
+        action_keys = list(action_mapping.keys())
+        if action in action_keys:
+            action_function = action_mapping[action]
+            action_execution_status = action_function(param)
 
-        if action_id == "get_device_software":
-            ret_val = self._handle_get_device_software(param)
-
-        if action_id == "get_device":
-            ret_val = self._handle_get_device(param)
-
-        if action_id == "get_device_by_hostname":
-            ret_val = self._handle_get_device_by_hostname(param)
-
-        if action_id == "list_organization_users":
-            ret_val = self._handle_list_organization_users(param)
-
-        if action_id == "get_device_by_ip_address":
-            ret_val = self._handle_get_device_by_ip_address(param)
-
-        if action_id == "list_groups":
-            ret_val = self._handle_list_groups(param)
-
-        if action_id == "get_command_queues":
-            ret_val = self._handle_get_command_queues(param)
-
-        if action_id == "remove_user_from_account":
-            ret_val = self._handle_remove_user_from_account(param)
-
-        if action_id == "update_device":
-            ret_val = self._handle_update_device(param)
-
-        if action_id == "delete_device":
-            ret_val = self._handle_delete_device(param)
-
-        if action_id == "test_connectivity":
-            ret_val = self._handle_test_connectivity(param)
-
-        return ret_val
+        return action_execution_status
 
     def finalize(self):
         # Save the state, this data is saved across actions and app upgrades
