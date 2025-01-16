@@ -185,12 +185,7 @@ class AutomoxConnector(BaseConnector):
         """
         Check if value is not null or number to prevent 0 from being removed
         """
-        if isinstance(value, (int, float)):
-            return True
-        elif value is not None:
-            return True
-        else:
-            return False
+        return isinstance(value, (int, float)) or not None
 
     def remove_null_values(self, item: Collection):
         """
