@@ -1,0 +1,1173 @@
+{
+    "appid": "299791c0-3565-4d73-b85d-ed6ef95edcb0",
+    "name": "Automox",
+    "description": "Automox is the IT automation platform for modern organizations. Utilizing this app allows for the orchestration of IT operations such as device management, triggering remote\r\noutcomes on endpoints, and basic Automox platform administration.",
+    "type": "endpoint",
+    "product_vendor": "Automox",
+    "logo": "automox.png",
+    "logo_dark": "automox_dark.png",
+    "product_name": "Automox",
+    "python_version": "3",
+    "product_version_regex": ".*",
+    "publisher": "Automox",
+    "license": "Copyright (c) Automox, 2025",
+    "app_version": "1.0.0",
+    "utctime_updated": "2025-01-16T15:26:24.042220Z",
+    "package_name": "phantom_automox",
+    "main_module": "automox_connector.py",
+    "min_phantom_version": "6.3.1.178",
+    "app_wizard_version": "1.0.0",
+    "configuration": {
+        "ax_console_api_key": {
+            "description": "Organization API key",
+            "data_type": "password",
+            "required": true,
+            "order": 0
+        },
+        "page_limit": {
+            "description": "Change how many results are returned on a page (default is 100)",
+            "data_type": "numeric",
+            "required": false,
+            "value_list": [],
+            "default": "100",
+            "order": 1
+        }
+    },
+    "actions": [
+        {
+            "action": "test connectivity",
+            "identifier": "test_connectivity",
+            "description": "Validate the asset configuration for connectivity using supplied configuration",
+            "verbose": "",
+            "type": "test",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "run policy",
+            "identifier": "run_worklet",
+            "description": "Schedule a policy for immediate remediation",
+            "verbose": "Use this action to run a policy/worklet on a specific device. For example, you can craft an incident response worklet in your console and use this action to call it.",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "org_id": {
+                    "description": "Automox Organization ID",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0,
+                    "name": "org_id",
+                    "id": 1,
+                    "param_name": "org_id"
+                },
+                "server_id": {
+                    "description": "Automox Device ID",
+                    "data_type": "numeric",
+                    "required": true,
+                    "primary": true,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 1,
+                    "name": "server_id",
+                    "id": 2,
+                    "param_name": "server_id"
+                },
+                "policy_id": {
+                    "description": "Automox Policy ID",
+                    "data_type": "numeric",
+                    "required": true,
+                    "primary": true,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 2,
+                    "name": "policy_id",
+                    "id": 3,
+                    "param_name": "policy_id"
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.org_id",
+                    "data_type": "numeric",
+                    "contains": [],
+                    "column_name": "org_id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.server_id",
+                    "data_type": "numeric",
+                    "contains": [],
+                    "column_name": "server_id",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.policy_id",
+                    "data_type": "numeric",
+                    "contains": [],
+                    "column_name": "policy_id",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list policies",
+            "identifier": "list_policies",
+            "description": "List all the policies available in your organization",
+            "verbose": "List all the policies available in your organization. For example, you can use this action to get policy data (like a Policy ID) that you can use or pass to other actions.",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "org_id": {
+                    "description": "Automox Organization ID",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0,
+                    "name": "org_id",
+                    "id": 1,
+                    "param_name": "org_id"
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.org_id",
+                    "data_type": "numeric",
+                    "contains": [],
+                    "column_name": "provided_org_id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.*.id",
+                    "data_type": "string",
+                    "column_name": "id",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.*.uuid",
+                    "data_type": "string",
+                    "column_name": "uuid",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.*.name",
+                    "data_type": "string",
+                    "column_name": "name",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.*.organization_id",
+                    "data_type": "string",
+                    "column_name": "organization_id",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.*.create_time",
+                    "data_type": "string",
+                    "column_name": "create_time",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.*.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list devices",
+            "identifier": "list_devices",
+            "description": "This action is used to retrieve Automox managed devices",
+            "verbose": "This action is used to retrieve Automox managed devices. For example, you can use this action to get device data that you can use or pass to other actions.",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "org_id": {
+                    "description": "Automox Organization ID",
+                    "data_type": "string",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0,
+                    "name": "org_id",
+                    "id": 1,
+                    "param_name": "org_id"
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.org_id",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "provided_org_id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.*.id",
+                    "data_type": "string",
+                    "column_name": "device_id",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.*.uuid",
+                    "data_type": "string",
+                    "column_name": "uuid",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.*.name",
+                    "data_type": "string",
+                    "column_name": "name",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.*.custom_name",
+                    "data_type": "string",
+                    "column_name": "custom_name",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.*.connected",
+                    "data_type": "string",
+                    "column_name": "connected",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.*.ip_addrs",
+                    "data_type": "string",
+                    "column_name": "ip_addrs",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.data.*.*.ip_addrs_private",
+                    "data_type": "string",
+                    "column_name": "ip_addrs_private",
+                    "column_order": 8
+                },
+                {
+                    "data_path": "action_result.data.*.*.last_logged_in_user",
+                    "data_type": "string",
+                    "column_name": "last_logged_in_user",
+                    "column_order": 9
+                },
+                {
+                    "data_path": "action_result.data.*.*.server_group_id",
+                    "data_type": "string",
+                    "column_name": "server_group_id",
+                    "column_order": 10
+                },
+                {
+                    "data_path": "action_result.data.*.*.organization_id",
+                    "data_type": "string",
+                    "column_name": "organization_id",
+                    "column_order": 11
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list organizations",
+            "identifier": "list_organizations",
+            "description": "This action is used to retrieve Automox organizations",
+            "verbose": "This action is used to retrieve Automox organizations that the authenticated user belongs to.",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {},
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get device software",
+            "identifier": "get_device_software",
+            "description": "This action is used to retrieve a list of software installed on a device",
+            "verbose": "This action is used to retrieve a list of software installed on a device.",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "device_id": {
+                    "description": "Identifier of device",
+                    "data_type": "numeric",
+                    "required": true,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0,
+                    "name": "device_id",
+                    "id": 1,
+                    "param_name": "device_id"
+                },
+                "org_id": {
+                    "description": "Identifier of organization",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 1,
+                    "name": "org_id",
+                    "id": 2,
+                    "param_name": "org_id"
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.device_id",
+                    "data_type": "numeric",
+                    "contains": [],
+                    "column_name": "device_id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.org_id",
+                    "data_type": "numeric",
+                    "contains": [],
+                    "column_name": "provided_org_id",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.*.create_time",
+                    "data_type": "string",
+                    "column_name": "create_time",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.*.display_name",
+                    "data_type": "string",
+                    "column_name": "display_name",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.*.id",
+                    "data_type": "string",
+                    "column_name": "package_id",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.*.installed",
+                    "data_type": "string",
+                    "column_name": "installed",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.*.name",
+                    "data_type": "string",
+                    "column_name": "name",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.data.*.*.organization_id",
+                    "data_type": "string",
+                    "column_name": "organization_id",
+                    "column_order": 8
+                },
+                {
+                    "data_path": "action_result.data.*.*.os_name",
+                    "data_type": "string",
+                    "column_name": "os_name",
+                    "column_order": 9
+                },
+                {
+                    "data_path": "action_result.data.*.*.os_version",
+                    "data_type": "string",
+                    "column_name": "os_version",
+                    "column_order": 10
+                },
+                {
+                    "data_path": "action_result.data.*.*.package_id",
+                    "data_type": "string",
+                    "column_name": "package_id",
+                    "column_order": 11
+                },
+                {
+                    "data_path": "action_result.data.*.*.package_version_id",
+                    "data_type": "string",
+                    "column_name": "package_version_id",
+                    "column_order": 12
+                },
+                {
+                    "data_path": "action_result.data.*.*.repo",
+                    "data_type": "string",
+                    "column_name": "repo",
+                    "column_order": 13
+                },
+                {
+                    "data_path": "action_result.data.*.*.server_id",
+                    "data_type": "string",
+                    "column_name": "server_id",
+                    "column_order": 14
+                },
+                {
+                    "data_path": "action_result.data.*.*.software_id",
+                    "data_type": "string",
+                    "column_name": "software_id",
+                    "column_order": 15
+                },
+                {
+                    "data_path": "action_result.data.*.*.version",
+                    "data_type": "string",
+                    "column_name": "version",
+                    "column_order": 16
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get device",
+            "identifier": "get_device",
+            "description": "Retrieve data for a specific device in the AX Console.",
+            "verbose": "Retrieve data for a specific device in the AX Console.",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "device_id": {
+                    "description": "Automox Device ID",
+                    "data_type": "numeric",
+                    "required": true,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0,
+                    "name": "device_id",
+                    "id": 1,
+                    "param_name": "device_id"
+                },
+                "org_id": {
+                    "description": "Automox Organization ID",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 1,
+                    "name": "org_id",
+                    "id": 2,
+                    "param_name": "org_id"
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.device_id",
+                    "data_type": "numeric",
+                    "contains": [],
+                    "column_name": "device_id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.org_id",
+                    "data_type": "numeric",
+                    "contains": [],
+                    "column_name": "org_id",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get device by hostname",
+            "identifier": "get_device_by_hostname",
+            "description": "d",
+            "verbose": "d",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "hostname": {
+                    "description": "1",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0,
+                    "name": "hostname"
+                },
+                "org_id": {
+                    "description": "2",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 1,
+                    "name": "org_id"
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.hostname",
+                    "data_type": "string",
+                    "contains": [
+                        "deviceHostname"
+                    ],
+                    "column_name": "hostname",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.org_id",
+                    "data_type": "numeric",
+                    "contains": [],
+                    "column_name": "org_id",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric",
+                    "column_name": "Device ID",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.connected",
+                    "data_type": "string",
+                    "column_name": "Connection Status",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.ip_addrs",
+                    "data_type": "numeric",
+                    "contains": [
+                        "ip"
+                    ],
+                    "column_name": "Public IPs",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.last_logged_in_user",
+                    "data_type": "string",
+                    "contains": [
+                        "sourceUserName",
+                        "destinationUserName"
+                    ],
+                    "column_name": "Last logged in user",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.server_group_id",
+                    "data_type": "numeric",
+                    "column_name": "Server group IDs",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list organization users",
+            "identifier": "list_organization_users",
+            "description": "This action is used to retrieve users of the Automox organization",
+            "verbose": "This action is used to retrieve users of the Automox organization.",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "org_id": {
+                    "description": "Identifier of organization",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0,
+                    "name": "org_id"
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.org_id",
+                    "data_type": "numeric",
+                    "contains": [],
+                    "column_name": "org_id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.*.id",
+                    "data_type": "numeric",
+                    "column_name": "id",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.*.uuid",
+                    "data_type": "string",
+                    "column_name": "uuid",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.*.name",
+                    "data_type": "string",
+                    "column_name": "name",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.*.email",
+                    "data_type": "string",
+                    "column_name": "email",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.*.orgs.*.id",
+                    "data_type": "string",
+                    "column_name": "org_id",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.*.orgs.*.name",
+                    "data_type": "string",
+                    "column_name": "org_name",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.data.*.*.tags",
+                    "data_type": "string",
+                    "column_name": "tags",
+                    "column_order": 8
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get device by ip address",
+            "identifier": "get_device_by_ip_address",
+            "description": "This action is used to find an Automox device by IP address",
+            "verbose": "This action is used to find an Automox device by IP address. You can provide a private or public IP address.",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "ip_address": {
+                    "description": "IP address of device",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0,
+                    "name": "ip_address",
+                    "id": 1,
+                    "param_name": "ip_address"
+                },
+                "org_id": {
+                    "description": "Identifier of organization to restrict results",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 1,
+                    "name": "org_id",
+                    "id": 2,
+                    "param_name": "org_id"
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.ip_address",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "ip_address",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.org_id",
+                    "data_type": "numeric",
+                    "contains": [],
+                    "column_name": "org_id",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list groups",
+            "identifier": "list_groups",
+            "description": "This action is used to list Automox groups",
+            "verbose": "This action is used to list Automox groups",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "org_id": {
+                    "description": "Identifier of organization to restrict results",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0,
+                    "name": "org_id",
+                    "id": 1,
+                    "param_name": "org_id"
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.org_id",
+                    "data_type": "numeric",
+                    "contains": [],
+                    "column_name": "provided_org_id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.*.id",
+                    "data_type": "string",
+                    "column_name": "id",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.*.name",
+                    "data_type": "string",
+                    "column_name": "name",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.*.organization_id",
+                    "data_type": "string",
+                    "column_name": "organization_id",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.*.parent_server_group_id",
+                    "data_type": "string",
+                    "column_name": "parent_server_group_id",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.*.policies.*",
+                    "data_type": "string",
+                    "column_name": "policies",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.*.server_count",
+                    "data_type": "string",
+                    "column_name": "server_count",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get command queues",
+            "identifier": "get_command_queues",
+            "description": "Use this action to return a list of queued up commands for a device",
+            "verbose": "Use this action to return a list of queued up commands for a device",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "device_id": {
+                    "description": "Identifier of device",
+                    "data_type": "numeric",
+                    "required": true,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0,
+                    "name": "device_id"
+                },
+                "org_id": {
+                    "description": "Identifier of organization",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 1,
+                    "name": "org_id"
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.device_id",
+                    "data_type": "numeric",
+                    "contains": [],
+                    "column_name": "provided_device_id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.org_id",
+                    "data_type": "numeric",
+                    "contains": [],
+                    "column_name": "provided_org_id",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.*.id",
+                    "data_type": "numeric",
+                    "column_name": "id",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.*.server_id",
+                    "data_type": "numeric",
+                    "column_name": "server_id",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.*.command_id",
+                    "data_type": "numeric",
+                    "column_name": "command_id",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.*.organization_id",
+                    "data_type": "numeric",
+                    "column_name": "organization_id",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.*.args",
+                    "data_type": "string",
+                    "column_name": "args",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.data.*.*.exec_time",
+                    "data_type": "string",
+                    "column_name": "exec_time",
+                    "column_order": 8
+                },
+                {
+                    "data_path": "action_result.data.*.*.response",
+                    "data_type": "string",
+                    "column_name": "response",
+                    "column_order": 9
+                },
+                {
+                    "data_path": "action_result.data.*.*.policy_id",
+                    "data_type": "numeric",
+                    "column_name": "policy_id",
+                    "column_order": 10
+                },
+                {
+                    "data_path": "action_result.data.*.*.command_type_name",
+                    "data_type": "string",
+                    "column_name": "command_type_name",
+                    "column_order": 11
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "remove user from account",
+            "identifier": "remove_user_from_account",
+            "description": "Use this action to remove a user from an account",
+            "verbose": "Use this action to remove a user from an account.",
+            "type": "contain",
+            "read_only": false,
+            "parameters": {
+                "account_id": {
+                    "description": "Account UUID to retrieve users for.",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0,
+                    "name": "account_id"
+                },
+                "user_id": {
+                    "description": "UUID of user to delete.",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 1,
+                    "name": "user_id"
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.account_id",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "account_id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.user_id",
+                    "data_type": "string",
+                    "contains": [],
+                    "column_name": "user_id",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        }
+    ]
+}
