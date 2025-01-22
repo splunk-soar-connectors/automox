@@ -1,5 +1,6 @@
 import json
 import re
+from math import ceil
 from typing import Any, Collection, Dict, Tuple
 from urllib.parse import quote, urlencode
 
@@ -19,24 +20,36 @@ class RetVal(tuple):
 
 
 class Params:
-    def __init__(self, query_params: Dict[str, str] = {}, path_params: Dict[str, str] = {}):
+    def __init__(self, query_params: Dict[str, str] = {}, path_params: Dict[str, str] = {}, **kwargs):
         self.query_params = query_params
         self.path_params = path_params
+        self.aux_params = dict(kwargs)
 
-    def build_params_string(self) -> Tuple[str, str]:
-        query_string = urlencode(self.query_params)
-        path_string = "/".join(f"{key}/{quote(str(value))}" for key, value in self.path_params.items())
-        return query_string, path_string
-
-
-class AutomoxAction:
-    def __init__(self, base_endpoint: str, params: Params, summary_key: str = None):
-        self.base_endpoint = base_endpoint
-        self.params = params
-        self.summary_key = summary_key
+    def to_dict(self) -> dict:
+        return {"query_params": self.query_params, "path_params": self.path_params}
 
 
 class AutomoxConnector(BaseConnector):
+
+    class AutomoxAction:
+        def __init__(
+            self,
+            base_endpoint: str,
+            handle_function: callable,
+            fetch_function: callable = None,
+            fetch_function_method: str = "get",
+            params: Params = None,
+            summary_key: str = None,
+        ):
+            if params is None:
+                params = Params()
+
+            self.base_endpoint = base_endpoint
+            self.params = params
+            self.summary_key = summary_key
+            self.handle_function = handle_function
+            self.fetch_function = fetch_function
+            self.fetch_function_method = fetch_function_method
 
     def __init__(self):
 
@@ -61,18 +74,22 @@ class AutomoxConnector(BaseConnector):
 
         return phantom.APP_SUCCESS
 
-    def _build_url(self, endpoint, path_params=None, query_params=None):
+    def _get_endpoint(self, action: AutomoxAction) -> str:
+        return self._build_url(
+            base_endpoint=action.base_endpoint, path_params=action.params.path_params, query_params=action.params.query_params
+        )
+
+    def _build_url(self, base_endpoint: str, path_params: dict = {}, query_params: dict = {}) -> str:
         """
         Constructs a full URL by replacing placeholders in the base endpoint and appending query parameters
         """
-
         # Replace path params
         if path_params:
             for key, value in path_params.items():
                 safe_value = quote(str(value), safe="")
                 placeholder = f"{{{key}}}"
-                if placeholder in endpoint:
-                    endpoint = endpoint.replace(placeholder, safe_value)
+                if placeholder in base_endpoint:
+                    base_endpoint = base_endpoint.replace(placeholder, safe_value)
                 else:
                     self.debug_print(f"Warning: Path param key '{key}' not found in endpoint.")
 
@@ -81,10 +98,10 @@ class AutomoxConnector(BaseConnector):
             query_params = {k: v for k, v in query_params.items() if v is not None and v != ""}
 
         # Append query params
-        full_url = endpoint
+        full_url = base_endpoint
         if query_params:
             query_string = urlencode(query_params)
-            full_url = f"{endpoint}?{query_string}"
+            full_url = f"{base_endpoint}?{query_string}"
 
         self.debug_print(f"The full URL we're returning: {full_url}")
         return full_url
@@ -146,7 +163,7 @@ class AutomoxConnector(BaseConnector):
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
-    def _make_rest_call(self, endpoint, action_result, method="get", **kwargs):
+    def _make_rest_call(self, endpoint, action_result, method="get", headers=None, **kwargs):
 
         config = self.get_config()
 
@@ -160,33 +177,34 @@ class AutomoxConnector(BaseConnector):
         url = self._base_url + endpoint
 
         try:
-            r = request_func(url, verify=config.get("verify_server_cert", False), **kwargs)
+            r = request_func(url, verify=config.get("verify_server_cert", False), headers=headers, **kwargs)
         except Exception as e:
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}".format(str(e))), resp_json)
 
         return self._process_response(r, action_result)
 
     # Pagination support
+    def _fetch_paginated_data(self, endpoint: str, params: dict, action_result: ActionResult, headers: dict) -> Tuple[int, list]:
+        params = self.first_page(params)  # add the initial pagination query params
 
-    def _fetch_paginated_data(self, base_endpoint, path_params, query_params, action_result):
-        pagination_params = self.first_page(query_params)
         all_items = []
 
         while True:
-            endpoint = self._build_url(base_endpoint, path_params, pagination_params)
-            ret_val, response = self._make_rest_call(endpoint, action_result, params=None, headers=self._headers)
+            ret_val, response = self._make_rest_call(endpoint=endpoint, action_result=action_result, params=params, headers=headers)
 
             if phantom.is_fail(ret_val):
-                return None, action_result.get_status()
+                return phantom.APP_ERROR, []
 
             all_items.extend(response)
 
             if len(response) < self._page_limit:
                 break
 
-            pagination_params = self.next_page(pagination_params)
+            # update the query params to get the next page
+            params = self.next_page(params)
+            self.debug_print(f"Fetching next page with updated query params: {params}")
 
-        return all_items, phantom.APP_SUCCESS
+        return phantom.APP_SUCCESS, all_items
 
     def first_page(self, params=None) -> dict:
         if params is None:
@@ -207,6 +225,31 @@ class AutomoxConnector(BaseConnector):
         """
         return isinstance(value, (int, float)) or not None
 
+    def _get_total_device_count(self, endpoint: str, action_result: ActionResult) -> int:
+        ret_val, response = self._make_rest_call(
+            endpoint=endpoint,
+            action_result=action_result,
+            params={"limit": 1},  # Fetch only one device to get the total count
+            headers=self._headers,
+        )
+
+        if phantom.is_fail(ret_val):
+            raise Exception(f"Failed to get total device count: {action_result.get_message()}")
+
+        return response[0].get("total_count", 0)
+
+    def _find_matching_device(self, devices: list, attributes: list[str], value: str) -> dict:
+        for device in devices:
+            for attr in attributes:
+                attr_value = device.get(attr)
+                if attr_value is None:
+                    continue
+                if isinstance(attr_value, str) and attr_value.casefold() == value.casefold():
+                    return device
+                if isinstance(attr_value, list) and value.lower() in (v.lower() for v in attr_value):
+                    return device
+        return {}
+
     def remove_null_values(self, item: Collection):
         """
         Recursively remove null values from a dictionary or list
@@ -226,351 +269,149 @@ class AutomoxConnector(BaseConnector):
         else:
             return item
 
-    def _handle_test_connectivity(self, param):
-        action_result = self.add_action_result(ActionResult(dict(param)))
+    def find_device_by_attribute(self, endpoint: str, attributes: list[str], value: str, action_result: ActionResult) -> dict:
 
-        endpoint = AUTOMOX_USERS_SELF_ENDPOINT
-        self.save_progress("Connecting to endpoint")
+        total_devices = self._get_total_device_count(endpoint, action_result)
+        if total_devices is None:
+            return {}
 
-        ret_val, response = self._make_rest_call(endpoint, action_result, params=None, headers=self._headers)
+        max_pages = ceil(total_devices / self._page_limit)
 
-        if phantom.is_fail(ret_val):
-            self.save_progress("Test Connectivity Failed.")
+        params = self.first_page()
+        current_page = 0
 
-        self.save_progress("Test Connectivity Passed")
-        return action_result.set_status(phantom.APP_SUCCESS)
-
-    def _handle_run_worklet(self, param):
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
-
-        action_result = self.add_action_result(ActionResult(dict(param)))
-
-        base_endpoint = AUTOMOX_POLICY_RUN_ENDPOINT
-
-        path_params = {"policy_id": param["policy_id"]}
-
-        query_params = {"o": param.get("org_id")}
-
-        endpoint = self._build_url(base_endpoint, path_params, query_params)
-
-        # POST body
-        server_id = param["server_id"]
-        body = {"action": "remediateAll", "serverId": server_id}
-
-        # make rest call
-        ret_val, response = self._make_rest_call(
-            endpoint,
-            action_result,
-            params=body,
-            headers=self._headers,
-            method="post",
-        )
-
-        if phantom.is_fail(ret_val):
-            return action_result.get_status()
-
-        action_result.add_data(response)
-
-        return action_result.set_status(phantom.APP_SUCCESS)
-
-    def _handle_list_polices(self, action: AutomoxAction, **kwargs):
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
-
-        action_result = self.add_action_result(ActionResult(action.param))
-
-        all_policies, ret_val = self._fetch_paginated_data(
-            base_endpoint=action.base_endpoint,
-            path_params=action.params.path_params,
-            query_params=action.params.query_params,
-            action_result=action_result,
-        )
-
-        if phantom.is_fail(ret_val):
-            return action_result.get_status()
-
-        action_result.add_data(all_policies)
-
-        summary = action_result.update_summary({})
-        summary[action.summary_key] = len(all_policies)
-
-        return action_result.set_status(phantom.APP_SUCCESS)
-
-    def _handle_list_devices(self, param):
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
-
-        action_result = self.add_action_result(ActionResult(dict(param)))
-
-        base_endpoint = AUTOMOX_DEVICE_LIST_ENDPOINT
-        path_params = None
-        query_params = {"o": param.get("org_id")}
-
-        all_devices, ret_val = self._fetch_paginated_data(base_endpoint, path_params, query_params, action_result)
-
-        if phantom.is_fail(ret_val):
-            return action_result.get_status()
-
-        action_result.add_data(all_devices)
-
-        summary = action_result.update_summary({})
-        summary["total_devices"] = len(all_devices)
-
-        return action_result.set_status(phantom.APP_SUCCESS)
-
-    def _handle_list_organizations(self, param):
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
-
-        action_result = self.add_action_result(ActionResult(dict(param)))
-
-        base_endpoint = AUTOMOX_ORGS_LIST_ENDPOINT
-        path_params = None
-        query_params = None
-
-        all_orgs, ret_val = self._fetch_paginated_data(base_endpoint, path_params, query_params, action_result)
-
-        if phantom.is_fail(ret_val):
-            return action_result.get_status()
-
-        action_result.add_data(all_orgs)
-
-        summary = action_result.update_summary({})
-        summary["total_orgs"] = len(all_orgs)
-
-        return action_result.set_status(phantom.APP_SUCCESS)
-
-    def _handle_get_device_software(self, param):
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
-
-        action_result = self.add_action_result(ActionResult(dict(param)))
-
-        base_endpoint = AUTOMOX_DEVICE_LIST_PACKAGES_ENDPOINT
-        path_params = {"device_id": param["device_id"]}
-        query_params = {"o": param.get("org_id")}
-
-        all_software, ret_val = self._fetch_paginated_data(base_endpoint, path_params, query_params, action_result)
-
-        if phantom.is_fail(ret_val):
-            return action_result.get_status()
-
-        action_result.add_data(all_software)
-
-        summary = action_result.update_summary({})
-        summary["num_of_packages"] = len(all_software)
-
-        return action_result.set_status(phantom.APP_SUCCESS)
-
-    def _handle_get_device(self, param):
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
-
-        action_result = self.add_action_result(ActionResult(dict(param)))
-
-        base_endpoint = AUTOMOX_DEVICE_LIST_SPECIFIC_ENDPOINT
-
-        path_params = {"device_id": param["device_id"]}
-        query_params = {"o": param.get("org_id")}
-
-        endpoint = self._build_url(base_endpoint, path_params, query_params)
-
-        ret_val, response = self._make_rest_call(endpoint, action_result, params=None, headers=self._headers)
-
-        if phantom.is_fail(ret_val):
-            return action_result.get_status()
-
-        action_result.add_data(response)
-
-        return action_result.set_status(phantom.APP_SUCCESS)
-
-    def _handle_get_device_by_hostname(self, param):
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
-
-        action_result = self.add_action_result(ActionResult(dict(param)))
-
-        hostname = param["hostname"]
-        org_id = param.get("org_id", "")
-
-        device = self.find_device_by_attribute(org_id, ["name"], hostname)
-
-        if not device:
-            return action_result.set_status(phantom.APP_ERROR, f"Device with hostname {hostname} not found")
-
-        action_result.add_data(device)
-
-        return action_result.set_status(phantom.APP_SUCCESS)
-
-    def find_device_by_attribute(self, org_id: int, attributes: list[str], value: str) -> dict:
-        self.debug_print("Starting find_device_by_attribute")
-
-        params = self.first_page({"o": org_id})
-        self.debug_print(f"Params: {params}")
-
-        action_result = ActionResult()
-
-        while True:
-            self.debug_print("Was true")
-            ret_val, devices = self._make_rest_call(AUTOMOX_DEVICE_LIST_ENDPOINT, action_result, params=params, headers=self._headers)
-
-            self.debug_print("Response from devices api:")
-            self.debug_print(devices)
+        while current_page < max_pages:
+            # get a list of devices to parse
+            self.debug_print("Fetching devices")
+            ret_val, devices = self._make_rest_call(endpoint=endpoint, action_result=action_result, params=params, headers=self._headers)
 
             if phantom.is_fail(ret_val):
                 self.debug_print(f"Failed to get devices: {action_result.get_message()}")
-                return {}
+                raise Exception(f"Failed to get devices: {action_result.get_message()}")
 
-            for device in devices:
-                self.debug_print(f"Device: {device}")
-                for attr in attributes:
-                    self.debug_print(f"Attribute: {attr}")
-                    if isinstance(device.get(attr), str) and device[attr].casefold() == value.casefold():
-                        return self.remove_null_values(device)
-                    if isinstance(device.get(attr), list) and value.lower() in (v.lower() for v in device[attr]):
-                        return self.remove_null_values(device)
+            device = self._find_matching_device(devices, attributes, value)
+            if device:
+                return self.remove_null_values(device)
 
-            if len(devices) < params["limit"]:
+            if len(devices) < self._page_limit:
                 break
 
             params = self.next_page(params)
+            current_page += 1
 
-        self.debug_print(f"Device {value} not found")
+        self.debug_print(f"Device relating to {value} not found")
         return {}
 
-    def _handle_list_organization_users(self, param):
+    # Action logic
+    def _handle_generic(self, action: AutomoxAction) -> int:
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
-        action_result = self.add_action_result(ActionResult(dict(param)))
+        action_result = self.add_action_result(ActionResult(action.params.to_dict()))
 
-        base_endpoint = AUTOMOX_USERS_LIST_ENDPOINT
-        path_params = None
-        query_params = {"o": param.get("org_id")}
+        endpoint = self._get_endpoint(action)
 
-        all_org_users, ret_val = self._fetch_paginated_data(base_endpoint, path_params, query_params, action_result)
+        fetch_function_kwargs = {
+            "endpoint": endpoint,
+            "params": action.params.query_params,
+            "action_result": action_result,
+            "headers": self._headers,
+        }
+
+        # Include POST body if fetch_function_method is POST
+        if action.fetch_function_method.lower() == "post":
+            fetch_function_kwargs["method"] = "post"
+            fetch_function_kwargs["data"] = json.dumps(action.params.aux_params.get("body"))
+
+        # Do a DELETE if fetch_function_method is DELETE
+        if action.fetch_function_method.lower() == "delete":
+            fetch_function_kwargs["method"] = "delete"
+
+        ret_val, response = action.fetch_function(**fetch_function_kwargs)
 
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        action_result.add_data(all_org_users)
+        action_result.add_data(response)
 
-        summary = action_result.update_summary({})
-        summary["total_users"] = len(all_org_users)
+        if action.summary_key:
+            summary = action_result.update_summary({})
+            summary[action.summary_key] = len(response)
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _handle_get_device_by_ip_address(self, param):
+    def _handle_get_device_by_ip_address(self, action: AutomoxAction) -> int:
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
-        action_result = self.add_action_result(ActionResult(dict(param)))
+        action_result = self.add_action_result(ActionResult(action.params.to_dict()))
 
-        ip_address = param["ip_address"]
+        endpoint = self._get_endpoint(action)
 
-        org_id = param.get("org_id", "")
+        ip_address = action.params.aux_params["ip_address"]
 
         # Validate IP address format using regex
         ip_pattern = re.compile(r"^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$")
         if not ip_pattern.match(ip_address):
             return action_result.set_status(phantom.APP_ERROR, f"Invalid IP address format: {ip_address}")
 
-        # Use find_device_by_attribute to find the device by Public IP
-        device = self.find_device_by_attribute(org_id, ["ip_addrs"], ip_address)
+        try:
+            # Use find_device_by_attribute to find the device by Public IP
+            device = self.find_device_by_attribute(endpoint=endpoint, attributes=["ip_addrs"], value=ip_address, action_result=action_result)
 
-        # if we didn't find a match using the Public IP, try private IPs
-        if not device:
-            self.save_progress("Device not found using public IP. Trying private IPs...")
-            device = self.find_device_by_attribute(org_id, ["ip_addrs_private"], ip_address)
+            # if we didn't find a match using the Public IP, try private IPs
+            if not device:
+                self.save_progress("Device not found using public IP. Trying private IPs...")
+                device = self.find_device_by_attribute(
+                    endpoint=endpoint, attributes=["ip_addrs_private"], value=ip_address, action_result=action_result
+                )
 
-        # if we don't find any matches at all
-        if not device:
-            return action_result.set_status(phantom.APP_ERROR, f"Device with IP address {ip_address} not found")
+            # if we don't find any matches at all
+            if not device:
+                return action_result.set_status(phantom.APP_ERROR, f"Device with IP address {ip_address} not found")
 
-        action_result.add_data(device)
+            action_result.add_data(device)
+            return action_result.set_status(phantom.APP_SUCCESS)
 
-        return action_result.set_status(phantom.APP_SUCCESS)
+        except Exception as e:
+            self.debug_print(f"Exception occurred: {str(e)}")
+            return action_result.set_status(phantom.APP_ERROR, f"Error finding device by IP address: {str(e)}")
 
-    def _handle_list_groups(self, param):
+    def _handle_get_device_by_hostname(self, action: AutomoxAction) -> int:
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
-        action_result = self.add_action_result(ActionResult(dict(param)))
+        action_result = self.add_action_result(ActionResult(action.params.to_dict()))
 
-        endpoint = AUTOMOX_GROUPS_LIST_ENDPOINT
+        endpoint = self._get_endpoint(action)
 
-        path_params = None
-        query_params = {"o": param.get("org_id")}
+        hostname = action.params.aux_params["hostname"]
 
-        all_groups, ret_val = self._fetch_paginated_data(endpoint, path_params, query_params, action_result)
+        try:
+            device = self.find_device_by_attribute(endpoint, attributes=["name"], value=hostname, action_result=action_result)
 
-        if phantom.is_fail(ret_val):
-            return action_result.get_status()
+            if not device:
+                return action_result.set_status(phantom.APP_ERROR, f"Device with hostname {hostname} not found")
 
-        action_result.add_data(all_groups)
+            action_result.add_data(device)
+            return action_result.set_status(phantom.APP_SUCCESS)
 
-        summary = action_result.update_summary({})
-        summary["total_groups"] = len(all_groups)
+        except Exception as e:
+            self.debug_print(f"Exception occurred: {str(e)}")
+            return action_result.set_status(phantom.APP_ERROR, f"Error finding device by hostname: {str(e)}")
 
-        return action_result.set_status(phantom.APP_SUCCESS)
-
-    def _handle_get_command_queues(self, param):
+    def _handle_update_device(self, action: AutomoxAction):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
-        action_result = self.add_action_result(ActionResult(dict(param)))
+        action_result = self.add_action_result(ActionResult(action.params.to_dict()))
 
-        base_endpoint = AUTOMOX_COMMAND_QUEUE_LIST_ENDPOINT
+        endpoint = self._get_endpoint(action)
 
-        path_params = {"device_id": param["device_id"]}
-
-        query_params = {"o": param.get("org_id")}
-
-        endpoint = self._build_url(base_endpoint, path_params, query_params)
-
-        # make rest call
-        ret_val, response = self._make_rest_call(endpoint, action_result, params=None, headers=self._headers)
-
-        if phantom.is_fail(ret_val):
-            return action_result.get_status()
-
-        action_result.add_data(response)
-
-        # Add a dictionary that is made up of the most important values from data into the summary
-        summary = action_result.update_summary({})
-        summary["total_commands_in_queue"] = len(response)
-
-        return action_result.set_status(phantom.APP_SUCCESS)
-
-    def _handle_remove_user_from_account(self, param):
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
-
-        action_result = self.add_action_result(ActionResult(dict(param)))
-
-        base_endpoint = AUTOMOX_REMOVE_USER_FROM_ACCOUNT_ENDPOINT
-
-        path_params = {"account_id": param["account_id"], "user_id": param["user_id"]}
-
-        query_params = None
-
-        endpoint = self._build_url(base_endpoint, path_params, query_params)
-
-        # make rest call
-        ret_val, response = self._make_rest_call(endpoint, action_result, params=None, headers=self._headers, method="delete")
-
-        if phantom.is_fail(ret_val):
-            return action_result.get_status()
-
-        action_result.add_data(response)
-
-        return action_result.set_status(phantom.APP_SUCCESS)
-
-    def _handle_update_device(self, param):
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
-
-        action_result = self.add_action_result(ActionResult(dict(param)))
-
-        base_endpoint = AUTOMOX_DEVICE_SPECIFIC_ENDPOINT
-
-        # Extract params
-        device_id = param["device_id"]
-        exception = param["exception"]
-        server_group_id = param["server_group_id"]
-        org_id = param.get("org_id")
-        tags = param.get("tags")
-        custom_name = param.get("custom_name")
+        # Extract aux params for POST body
+        exception = action.params.aux_params["exception"]
+        server_group_id = action.params.aux_params["server_group_id"]
+        tags = action.params.aux_params.get("tags")
+        custom_name = action.params.aux_params.get("custom_name")
 
         # Validate and process tags
+        tag_list = []
         if tags:
             # Check if the string is a valid comma-separated value
             if not re.match(r"^[a-zA-Z0-9_]+(,[a-zA-Z0-9_]+)*$", tags.strip()):
@@ -582,10 +423,6 @@ class AutomoxConnector(BaseConnector):
             # Split and process tags into a list
             tag_list = [tag.strip() for tag in tags.split(",")]
 
-        path_params = {"device_id": device_id}
-
-        query_params = {"o": org_id}
-
         body = {
             "server_group_id": server_group_id,
             "exception": exception,
@@ -595,8 +432,6 @@ class AutomoxConnector(BaseConnector):
 
         # Serialize the body to JSON for proper formatting (else tags have single quotes around them)
         json_body = json.dumps(body)
-
-        endpoint = self._build_url(base_endpoint, path_params, query_params)
 
         # make rest call
         ret_val, response = self._make_rest_call(endpoint, action_result, data=json_body, headers=self._headers, method="put")
@@ -608,35 +443,14 @@ class AutomoxConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _handle_delete_device(self, param):
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
-
-        action_result = self.add_action_result(ActionResult(dict(param)))
-
-        base_endpoint = AUTOMOX_DEVICE_SPECIFIC_ENDPOINT
-
-        path_params = {"device_id": param["device_id"]}
-
-        query_params = {"o": param.get("org_id")}
-
-        endpoint = self._build_url(base_endpoint, path_params, query_params)
-
-        ret_val, response = self._make_rest_call(endpoint, action_result, params=None, headers=self._headers, method="delete")
-
-        if phantom.is_fail(ret_val):
-            return action_result.get_status()
-
-        action_result.add_data(response)
-
-        return action_result.set_status(phantom.APP_SUCCESS)
-
-    def handle_action(self, param):
+    def handle_action(self, param: dict) -> int:
         # Get the action that we are supposed to execute for this App Run
-        self.debug_print("action_id ", self.get_action_identifier())
+        action_id = self.get_action_identifier()
+        self.debug_print("action_id ", action_id)
 
-        if self.get_action_identifier() == phantom.ACTION_ID_INGEST_ON_POLL:
+        if action_id == phantom.ACTION_ID_INGEST_ON_POLL:
             start_time = time.time()
-            result = self._on_poll(param)
+            result = self._on_poll(action)
             end_time = time.time()
             diff_time = end_time - start_time
             human_time = str(timedelta(seconds=int(diff_time)))
@@ -645,30 +459,130 @@ class AutomoxConnector(BaseConnector):
             return result
 
         action_mapping = {
-            "test_asset_connectivity": self._handle_test_connectivity,
-            "list_groups": self._handle_list_groups,
-            "run_policy": self._handle_run_worklet,
-            "list_policies": self._handle_list_policies,
-            "list_organizations": self._handle_list_organizations,
-            "list_organization_users": self._handle_list_organization_users,
-            "list_devices": self._handle_list_devices,
-            "get_device": self._handle_get_device,
-            "get_device_by_hostname": self._handle_get_device_by_hostname,
-            "get_device_by_ip_address": self._handle_get_device_by_ip_address,
-            "get_device_software": self._handle_get_device_software,
-            "get_command_queues": self._handle_get_command_queues,
-            "remove_user_from_account": self._handle_remove_user_from_account,
-            "update_device": self._handle_update_device,
-            "delete_device": self._handle_delete_device,
+            "test_connectivity": AutomoxConnector.AutomoxAction(
+                base_endpoint=AUTOMOX_USERS_SELF_ENDPOINT,
+                # handle_function=self._handle_test_connectivity
+                handle_function=self._handle_generic,
+                fetch_function=self._make_rest_call,
+            ),
+            "list_groups": AutomoxConnector.AutomoxAction(
+                base_endpoint=AUTOMOX_GROUPS_LIST_ENDPOINT,
+                handle_function=self._handle_generic,
+                fetch_function=self._fetch_paginated_data,
+                fetch_function_method="get",
+                params=Params(query_params={"o": param.get("org_id")}),
+                summary_key="total_groups",
+            ),
+            "run_policy": AutomoxConnector.AutomoxAction(
+                base_endpoint=AUTOMOX_POLICY_RUN_ENDPOINT,
+                handle_function=self._handle_generic,
+                fetch_function=self._make_rest_call,
+                fetch_function_method="post",
+                params=Params(
+                    query_params={"o": param.get("org_id")},
+                    path_params={"policy_id": param.get("policy_id")},
+                    body={"action": "remediateAll", "serverId": param.get("device_id")},
+                ),
+            ),
+            "list_policies": AutomoxConnector.AutomoxAction(
+                base_endpoint=AUTOMOX_POLICY_LIST_ENDPOINT,
+                handle_function=self._handle_generic,
+                fetch_function=self._fetch_paginated_data,
+                params=Params(query_params={"o": param.get("org_id")}),
+                summary_key="total_policies",
+            ),
+            "list_organizations": AutomoxConnector.AutomoxAction(
+                base_endpoint=AUTOMOX_ORGS_LIST_ENDPOINT,
+                handle_function=self._handle_generic,
+                fetch_function=self._make_rest_call,
+                summary_key="total_orgs",
+            ),
+            "list_organization_users": AutomoxConnector.AutomoxAction(
+                base_endpoint=AUTOMOX_USERS_LIST_ENDPOINT,
+                handle_function=self._handle_generic,
+                fetch_function=self._fetch_paginated_data,
+                params=Params(query_params={"o": param.get("org_id")}),
+                summary_key="total_users",
+            ),
+            "list_devices": AutomoxConnector.AutomoxAction(
+                base_endpoint=AUTOMOX_DEVICE_LIST_ENDPOINT,
+                handle_function=self._handle_generic,
+                fetch_function=self._fetch_paginated_data,
+                params=Params(query_params={"o": param.get("org_id")}),
+                summary_key="total_devices",
+            ),
+            "get_device": AutomoxConnector.AutomoxAction(
+                base_endpoint=AUTOMOX_DEVICE_SPECIFIC_ENDPOINT,
+                handle_function=self._handle_generic,
+                fetch_function=self._make_rest_call,
+                params=Params(query_params={"o": param.get("org_id")}, path_params={"device_id": param.get("device_id")}),
+                summary_key="",
+            ),
+            "get_device_by_hostname": AutomoxConnector.AutomoxAction(
+                base_endpoint=AUTOMOX_DEVICE_LIST_ENDPOINT,
+                handle_function=self._handle_get_device_by_hostname,
+                params=Params(query_params={"o": param.get("org_id")}, hostname=param.get("hostname")),
+                summary_key="",
+            ),
+            "get_device_by_ip_address": (
+                AutomoxConnector.AutomoxAction(
+                    base_endpoint=AUTOMOX_DEVICE_LIST_ENDPOINT,
+                    handle_function=self._handle_get_device_by_ip_address,
+                    params=Params(query_params={"o": param.get("org_id")}, ip_address=param.get("ip_address")),
+                )
+            ),
+            "get_device_software": AutomoxConnector.AutomoxAction(
+                base_endpoint=AUTOMOX_DEVICE_LIST_PACKAGES_ENDPOINT,
+                handle_function=self._handle_generic,
+                fetch_function=self._fetch_paginated_data,
+                params=Params(query_params={"o": param.get("org_id")}, path_params={"device_id": param.get("device_id")}),
+                summary_key="num_of_packages",
+            ),
+            "get_command_queues": AutomoxConnector.AutomoxAction(
+                base_endpoint=AUTOMOX_COMMAND_QUEUE_LIST_ENDPOINT,
+                handle_function=self._handle_generic,
+                fetch_function=self._make_rest_call,
+                params=Params(query_params={"o": param.get("org_id")}, path_params={"device_id": param.get("device_id")}),
+                summary_key="total_commands_in_queue",
+            ),
+            "remove_user_from_account": AutomoxConnector.AutomoxAction(
+                base_endpoint=AUTOMOX_REMOVE_USER_FROM_ACCOUNT_ENDPOINT,
+                handle_function=self._handle_generic,
+                fetch_function=self._make_rest_call,
+                fetch_function_method="delete",
+                params=Params(path_params={"account_id": param.get("account_id"), "user_id": param.get("user_id")}),
+            ),
+            "update_device": AutomoxConnector.AutomoxAction(
+                base_endpoint=AUTOMOX_DEVICE_SPECIFIC_ENDPOINT,
+                handle_function=self._handle_update_device,
+                # fetch_function=self._make_rest_call,
+                # fetch_function_method="put",
+                params=Params(
+                    query_params={"o": param.get("org_id")},
+                    path_params={"device_id": param.get("device_id")},
+                    exception=param.get("exception"),
+                    server_group_id=param.get("server_group_id"),
+                    tags=param.get("tags"),
+                    custom_name=param.get("custom_name"),
+                ),
+            ),
+            "delete_device": AutomoxConnector.AutomoxAction(
+                base_endpoint=AUTOMOX_DEVICE_SPECIFIC_ENDPOINT,
+                handle_function=self._handle_generic,
+                fetch_function=self._make_rest_call,
+                fetch_function_method="delete",
+                params=Params(query_params={"o": param.get("org_id")}, path_params={"device_id": param.get("device_id")}),
+            ),
         }
 
-        action = self.get_action_identifier()
         action_execution_status = phantom.APP_SUCCESS
 
-        action_keys = list(action_mapping.keys())
-        if action in action_keys:
-            action_function = action_mapping[action]
-            action_execution_status = action_function(param)
+        if action_id in action_mapping:
+            action_object = action_mapping[action_id]
+            self.debug_print("Executing action function: ", action_object.handle_function)
+            action_execution_status = action_object.handle_function(action_object)
+        else:
+            self.debug_print("Action ID not found in action_mapping: ", action_id)
 
         return action_execution_status
 
@@ -729,13 +643,14 @@ def main():
         print(json.dumps(in_json, indent=4))
 
         connector = AutomoxConnector()
+        action = AutomoxAction()
         connector.print_progress_message = True
 
         if session_id is not None:
             in_json["user_session_token"] = session_id
             connector._set_csrf_info(csrftoken, headers["Referer"])
 
-        ret_val = connector._handle_action(json.dumps(in_json), None)
+        ret_val = connector._handle_action(action, None)
         print(json.dumps(json.loads(ret_val), indent=4))
 
     exit(0)
