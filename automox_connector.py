@@ -19,6 +19,15 @@ class RetVal(tuple):
 
 
 class Params:
+    """
+    A class to handle various parameter types used in API requests.
+
+    Attributes:
+        query_params (Dict[str, str]): Query parameters for the API request
+        path_params (Dict[str, str]): Path parameters for the API request
+        aux_params (dict): Additional parameters for the API request
+    """
+
     def __init__(self, query_params: Dict[str, str] = {}, path_params: Dict[str, str] = {}, **kwargs):
         self.query_params = query_params
         self.path_params = path_params
@@ -31,6 +40,18 @@ class Params:
 class AutomoxConnector(BaseConnector):
 
     class AutomoxAction:
+        """
+        Inner class representing an Action with the Automox API.
+
+        Attributes:
+            base_endpoint (str): Base API endpoint for the action
+            params (Params): Parameters for the action
+            summary_key (str): Key used for action summary
+            handle_function (callable): Function to handle the action
+            fetch_function (callable): Function to fetch data from API
+            fetch_function_method (str): HTTP method for the fetch function
+        """
+
         def __init__(
             self,
             base_endpoint: str,
@@ -178,6 +199,18 @@ class AutomoxConnector(BaseConnector):
 
     # Pagination support
     def _fetch_paginated_data(self, endpoint: str, params: dict, action_result: ActionResult, headers: dict) -> Tuple[int, list]:
+        """
+        Fetches all pages of data from a paginated API endpoint.
+
+        Args:
+            endpoint (str): API endpoint to fetch data from
+            params (dict): Query parameters for the request
+            action_result (ActionResult): Action result object for status tracking
+            headers (dict): Request headers
+
+        Returns:
+            Tuple[int, list]: Status code and list of fetched items
+        """
         params = self.first_page(params)  # add the initial pagination query params
 
         all_items = []
@@ -232,6 +265,17 @@ class AutomoxConnector(BaseConnector):
         return response[0].get("total_count", 0)
 
     def _find_matching_device(self, devices: list, attributes: list[str], value: str) -> dict:
+        """
+        Searches for a device matching specified attributes and value.
+
+        Args:
+            devices (list): List of device dictionaries to search
+            attributes (list[str]): Device attributes to check
+            value (str): Value to match against
+
+        Returns:
+            dict: Matching device dictionary or empty dict if not found
+        """
         for device in devices:
             for attr in attributes:
                 attr_value = device.get(attr)
@@ -263,6 +307,21 @@ class AutomoxConnector(BaseConnector):
             return item
 
     def find_device_by_attribute(self, endpoint: str, attributes: list[str], value: str, action_result: ActionResult) -> dict:
+        """
+        Searches through all devices to find one matching specified attributes.
+
+        Args:
+            endpoint (str): API endpoint for device listing
+            attributes (list[str]): Device attributes to check
+            value (str): Value to match against
+            action_result (ActionResult): Action result object for status tracking
+
+        Returns:
+            dict: Matching device dictionary or empty dict if not found
+
+        Raises:
+            Exception: If API call fails
+        """
         total_devices = self._get_total_device_count(endpoint, action_result)
         if total_devices is None:
             return {}
@@ -332,6 +391,15 @@ class AutomoxConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_get_device_by_ip_address(self, action: AutomoxAction) -> int:
+        """
+        Handles the get_device_by_ip_address action.
+
+        Args:
+            action (AutomoxAction): Action configuration object
+
+        Returns:
+            int: Action status code (success/failure)
+        """
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         action_result = self.add_action_result(ActionResult(action.params.to_dict()))
@@ -368,6 +436,15 @@ class AutomoxConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, f"Error finding device by IP address: {str(e)}")
 
     def _handle_get_device_by_hostname(self, action: AutomoxAction) -> int:
+        """
+        Handles the get_device_by_hostname action.
+
+        Args:
+            action (AutomoxAction): Action configuration object
+
+        Returns:
+            int: Action status code (success/failure)
+        """
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         action_result = self.add_action_result(ActionResult(action.params.to_dict()))
@@ -390,6 +467,15 @@ class AutomoxConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, f"Error finding device by hostname: {str(e)}")
 
     def _handle_update_device(self, action: AutomoxAction):
+        """
+        Handles the update_device action.
+
+        Args:
+            action (AutomoxAction): Action configuration object
+
+        Returns:
+            int: Action status code (success/failure)
+        """
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         action_result = self.add_action_result(ActionResult(action.params.to_dict()))
@@ -436,6 +522,15 @@ class AutomoxConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def handle_action(self, param: dict) -> int:
+        """
+        Main action handler for the connector. This is also where the action mapping/config is defined.
+
+        Args:
+            param (dict): Parameters for the action
+
+        Returns:
+            int: Action status code (success/failure)
+        """
         # Get the action that we are supposed to execute for this App Run
         action_id = self.get_action_identifier()
         self.debug_print("action_id ", action_id)
