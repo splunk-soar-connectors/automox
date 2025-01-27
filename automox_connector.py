@@ -635,7 +635,7 @@ def main():
         print(json.dumps(in_json, indent=4))
 
         connector = AutomoxConnector()
-        action = AutomoxAction()
+        action = AutomoxConnector.AutomoxAction()
         connector.print_progress_message = True
 
         if session_id is not None:
