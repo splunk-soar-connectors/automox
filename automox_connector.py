@@ -14,7 +14,6 @@ from automox_consts import *
 
 
 class RetVal(tuple):
-
     def __new__(cls, val1, val2=None):
         return tuple.__new__(RetVal, (val1, val2))
 
@@ -52,14 +51,12 @@ class AutomoxConnector(BaseConnector):
             self.fetch_function_method = fetch_function_method
 
     def __init__(self):
-
         super(AutomoxConnector, self).__init__()
 
         self._state = None
         self._base_url = None
 
     def initialize(self):
-
         config = self.get_config()
 
         # Load the state in initialize, use it to store data
@@ -164,7 +161,6 @@ class AutomoxConnector(BaseConnector):
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _make_rest_call(self, endpoint, action_result, method="get", headers=None, **kwargs):
-
         config = self.get_config()
 
         resp_json = None
@@ -270,7 +266,6 @@ class AutomoxConnector(BaseConnector):
             return item
 
     def find_device_by_attribute(self, endpoint: str, attributes: list[str], value: str, action_result: ActionResult) -> dict:
-
         total_devices = self._get_total_device_count(endpoint, action_result)
         if total_devices is None:
             return {}
