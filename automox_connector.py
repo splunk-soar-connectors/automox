@@ -358,7 +358,6 @@ class AutomoxConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         action_result = self.add_action_result(ActionResult(action.params.to_dict()))
-
         endpoint = self._get_endpoint(action)
 
         fetch_function_kwargs = {
@@ -403,7 +402,6 @@ class AutomoxConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         action_result = self.add_action_result(ActionResult(action.params.to_dict()))
-
         endpoint = self._get_endpoint(action)
 
         ip_address = action.params.aux_params["ip_address"]
@@ -448,7 +446,6 @@ class AutomoxConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         action_result = self.add_action_result(ActionResult(action.params.to_dict()))
-
         endpoint = self._get_endpoint(action)
 
         hostname = action.params.aux_params["hostname"]
@@ -479,7 +476,6 @@ class AutomoxConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
 
         action_result = self.add_action_result(ActionResult(action.params.to_dict()))
-
         endpoint = self._get_endpoint(action)
 
         # Extract aux params for POST body
