@@ -245,7 +245,7 @@ class AutomoxConnector(BaseConnector):
         return new_params
 
     @staticmethod
-    def _is_value_or_number(value: Any) -> bool:
+    def _is_valid_number(value: Any) -> bool:
         """
         Check if value is not null or number to prevent 0 from being removed
         """
@@ -295,13 +295,13 @@ class AutomoxConnector(BaseConnector):
             return dict(
                 (key, self.remove_null_values(value))
                 for key, value in item.items()
-                if self._is_value_or_number(value) and self._is_value_or_number(self.remove_null_values(value))
+                if self._is_valid_number(value) and self._is_valid_number(self.remove_null_values(value))
             )
         elif isinstance(item, list):
             return [
                 self.remove_null_values(value)
                 for value in item
-                if self._is_value_or_number(value) and self._is_value_or_number(self.remove_null_values(value))
+                if self._is_valid_number(value) and self._is_valid_number(self.remove_null_values(value))
             ]
         else:
             return item
