@@ -62,11 +62,8 @@ class AutomoxConnector(BaseConnector):
         # Load the state in initialize, use it to store data
         # that needs to be accessed across actions
         self._state = self.load_state()
-
         self._base_url = AUTOMOX_CONSOLE_API_URL
-
         self._headers = {"Content-Type": "application/json", "Authorization": f"Bearer {config['ax_console_api_key']}"}
-
         self._page_limit = int(config.get("page_limit", 100))
 
         return phantom.APP_SUCCESS
