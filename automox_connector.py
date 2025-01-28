@@ -1,3 +1,4 @@
+import argparse
 import json
 import re
 from math import ceil
@@ -718,8 +719,6 @@ class AutomoxConnector(BaseConnector):
 
 
 def main():
-    import argparse
-
     argparser = argparse.ArgumentParser()
 
     argparser.add_argument("input_test_json", help="Input Test JSON file")
