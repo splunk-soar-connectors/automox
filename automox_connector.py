@@ -1,7 +1,7 @@
 import json
 import re
 from math import ceil
-from typing import Any, Collection, Dict, Tuple
+from typing import Any, Dict, List, Optional, Tuple, TypedDict, Union
 from urllib.parse import quote, urlencode
 
 import phantom.app as phantom
@@ -28,13 +28,51 @@ class Params:
         aux_params (dict): Additional parameters for the API request
     """
 
-    def __init__(self, query_params: Dict[str, str] = {}, path_params: Dict[str, str] = {}, **kwargs):
+    def __init__(self, query_params: Dict[str, str] = {}, path_params: Dict[str, str] = {}, **kwargs) -> None:
         self.query_params = query_params
         self.path_params = path_params
         self.aux_params = dict(kwargs)
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> Dict[str, Dict[str, str]]:
         return {"query_params": self.query_params, "path_params": self.path_params}
+
+
+class Device(TypedDict, total=False):
+    """Type definition for Automox device attributes
+
+    Attributes:
+        id (int): Device ID
+        name (str): Device hostname/name
+        display_name (str): Custom display name
+        ip_addrs (List[str]): List of public IP addresses
+        ip_addrs_private (List[str]): List of private IP addresses
+        os_family (str): Operating system family
+        os_name (str): Operating system name
+        os_version (str): Operating system version
+        server_group_id (int): Group ID the device belongs to
+        tags (List[str]): List of tags assigned to device
+        total_count (int): Total count for paginated responses
+        status (str): Device status
+        last_refresh (str): Last device refresh timestamp
+        custom_name (str): User-defined device name
+        exception (bool): Whether device has "exclude from reports" flag
+    """
+
+    id: int
+    name: str
+    display_name: str
+    ip_addrs: List[str]
+    ip_addrs_private: List[str]
+    os_family: str
+    os_name: str
+    os_version: str
+    server_group_id: int
+    tags: List[str]
+    total_count: int
+    status: str
+    last_refresh: str
+    custom_name: str
+    exception: bool
 
 
 class AutomoxConnector(BaseConnector):
@@ -77,7 +115,7 @@ class AutomoxConnector(BaseConnector):
         self._state = None
         self._base_url = None
 
-    def initialize(self):
+    def initialize(self) -> int:
         config = self.get_config()
 
         # Load the state in initialize, use it to store data
@@ -94,7 +132,7 @@ class AutomoxConnector(BaseConnector):
             base_endpoint=action.base_endpoint, path_params=action.params.path_params, query_params=action.params.query_params
         )
 
-    def _build_url(self, base_endpoint: str, path_params: dict = {}, query_params: dict = {}) -> str:
+    def _build_url(self, base_endpoint: str, path_params: Dict[str, Any] = {}, query_params: Dict[str, Any] = {}) -> str:
         """
         Constructs a full URL by replacing placeholders in the base endpoint and appending query parameters
         """
@@ -121,13 +159,13 @@ class AutomoxConnector(BaseConnector):
         self.debug_print(f"The full URL we're returning: {full_url}")
         return full_url
 
-    def _process_empty_response(self, response, action_result):
+    def _process_empty_response(self, response: requests.Response, action_result: ActionResult) -> RetVal:
         if response.status_code in [200, 204]:
             return RetVal(phantom.APP_SUCCESS, {})
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, "Empty response and no information in the header"), None)
 
-    def _process_html_response(self, response, action_result):
+    def _process_html_response(self, response: requests.Response, action_result: ActionResult) -> RetVal:
         status_code = response.status_code
 
         try:
@@ -144,7 +182,7 @@ class AutomoxConnector(BaseConnector):
         message = message.replace("{", "{{").replace("}", "}}")
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
-    def _process_json_response(self, r, action_result):
+    def _process_json_response(self, r: requests.Response, action_result: ActionResult) -> RetVal:
         try:
             resp_json = r.json()
         except Exception as e:
@@ -157,7 +195,7 @@ class AutomoxConnector(BaseConnector):
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
-    def _process_response(self, r, action_result):
+    def _process_response(self, r: requests.Response, action_result: ActionResult) -> RetVal:
         if hasattr(action_result, "add_debug_data"):
             action_result.add_debug_data({"r_status_code": r.status_code})
             action_result.add_debug_data({"r_text": r.text})
@@ -178,7 +216,9 @@ class AutomoxConnector(BaseConnector):
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
-    def _make_rest_call(self, endpoint, action_result, method="get", headers=None, **kwargs):
+    def _make_rest_call(
+        self, endpoint: str, action_result: ActionResult, method: str = "get", headers: Optional[Dict[str, str]] = None, **kwargs: Any
+    ) -> RetVal:
         config = self.get_config()
 
         resp_json = None
@@ -198,7 +238,9 @@ class AutomoxConnector(BaseConnector):
         return self._process_response(r, action_result)
 
     # Pagination support
-    def _fetch_paginated_data(self, endpoint: str, params: dict, action_result: ActionResult, headers: dict) -> Tuple[int, list]:
+    def _fetch_paginated_data(
+        self, endpoint: str, params: Dict[str, Any], action_result: ActionResult, headers: Dict[str, str]
+    ) -> Tuple[int, List[Dict[str, Any]]]:
         """
         Fetches all pages of data from a paginated API endpoint.
 
@@ -239,7 +281,7 @@ class AutomoxConnector(BaseConnector):
         return params
 
     @staticmethod
-    def next_page(params: dict) -> dict:
+    def next_page(params: Dict[str, Any]) -> Dict[str, Any]:
         new_params = params.copy()
         new_params["page"] += 1
         return new_params
@@ -264,17 +306,17 @@ class AutomoxConnector(BaseConnector):
 
         return response[0].get("total_count", 0)
 
-    def _find_matching_device(self, devices: list, attributes: list[str], value: str) -> dict:
+    def _find_matching_device(self, devices: List[Device], attributes: List[str], value: str) -> Optional[Device]:
         """
         Searches for a device matching specified attributes and value.
 
         Args:
-            devices (list): List of device dictionaries to search
-            attributes (list[str]): Device attributes to check
+            devices (List[Device]): List of device dictionaries to search
+            attributes (List[str]): Device attributes to check
             value (str): Value to match against
 
         Returns:
-            dict: Matching device dictionary or empty dict if not found
+            Optional[Device]: Matching device dictionary or None if not found
         """
         for device in devices:
             for attr in attributes:
@@ -285,9 +327,9 @@ class AutomoxConnector(BaseConnector):
                     return device
                 if isinstance(attr_value, list) and value.lower() in (v.lower() for v in attr_value):
                     return device
-        return {}
+        return None
 
-    def remove_null_values(self, item: Collection):
+    def remove_null_values(self, item: Union[Dict[str, Any], List[Any], Any]) -> Union[Dict[str, Any], List[Any], Any]:
         """
         Recursively remove null values from a dictionary or list
         """
@@ -306,25 +348,25 @@ class AutomoxConnector(BaseConnector):
         else:
             return item
 
-    def find_device_by_attribute(self, endpoint: str, attributes: list[str], value: str, action_result: ActionResult) -> dict:
+    def find_device_by_attribute(self, endpoint: str, attributes: List[str], value: str, action_result: ActionResult) -> Optional[Device]:
         """
         Searches through all devices to find one matching specified attributes.
 
         Args:
             endpoint (str): API endpoint for device listing
-            attributes (list[str]): Device attributes to check
+            attributes (List[str]): Device attributes to check
             value (str): Value to match against
             action_result (ActionResult): Action result object for status tracking
 
         Returns:
-            dict: Matching device dictionary or empty dict if not found
+            Optional[Device]: Matching device dictionary or None if not found
 
         Raises:
             Exception: If API call fails
         """
         total_devices = self._get_total_device_count(endpoint, action_result)
         if total_devices is None:
-            return {}
+            return None
 
         max_pages = ceil(total_devices / self._page_limit)
 
@@ -342,7 +384,7 @@ class AutomoxConnector(BaseConnector):
 
             device = self._find_matching_device(devices, attributes, value)
             if device:
-                return self.remove_null_values(device)
+                return self.remove_null_values(device)  # type: ignore
 
             if len(devices) < self._page_limit:
                 break
@@ -351,7 +393,7 @@ class AutomoxConnector(BaseConnector):
             current_page += 1
 
         self.debug_print(f"Device relating to {value} not found")
-        return {}
+        return None
 
     # Action logic
     def _handle_generic(self, action: AutomoxAction) -> int:
@@ -426,7 +468,7 @@ class AutomoxConnector(BaseConnector):
             if not device:
                 return action_result.set_status(phantom.APP_ERROR, f"Device with IP address {ip_address} not found")
 
-            action_result.add_data(device)
+            action_result.add_data(device if device else {})
             return action_result.set_status(phantom.APP_SUCCESS)
 
         except Exception as e:
@@ -517,7 +559,7 @@ class AutomoxConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def handle_action(self, param: dict) -> int:
+    def handle_action(self, param: Dict[str, Any]) -> int:
         """
         Main action handler for the connector. This is also where the action mapping/config is defined.
 
@@ -669,7 +711,7 @@ class AutomoxConnector(BaseConnector):
 
         return action_execution_status
 
-    def finalize(self):
+    def finalize(self) -> int:
         # Save the state, this data is saved across actions and app upgrades
         self.save_state(self._state)
         return phantom.APP_SUCCESS
