@@ -348,14 +348,16 @@ class AutomoxConnector(BaseConnector):
         else:
             return item
 
-    def find_device_by_attribute(self, endpoint: str, attributes: List[str], value: str, action_result: ActionResult) -> Optional[Device]:
+    def find_device_by_attribute_with_value(
+        self, endpoint: str, attributes: List[str], value: str, action_result: ActionResult
+    ) -> Optional[Device]:
         """
-        Searches through all devices to find one matching specified attributes.
+        Searches through all devices to find one matching specified attributes with given value.
 
         Args:
             endpoint (str): API endpoint for device listing
             attributes (List[str]): Device attributes to check
-            value (str): Value to match against
+            value (str): Value to match against the attributes
             action_result (ActionResult): Action result object for status tracking
 
         Returns:
@@ -454,13 +456,15 @@ class AutomoxConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, f"Invalid IP address format: {ip_address}")
 
         try:
-            # Use find_device_by_attribute to find the device by Public IP
-            device = self.find_device_by_attribute(endpoint=endpoint, attributes=["ip_addrs"], value=ip_address, action_result=action_result)
+            # Use find_device_by_attribute_with_value to find the device by Public IP
+            device = self.find_device_by_attribute_with_value(
+                endpoint=endpoint, attributes=["ip_addrs"], value=ip_address, action_result=action_result
+            )
 
             # if we didn't find a match using the Public IP, try private IPs
             if not device:
                 self.save_progress("Device not found using public IP. Trying private IPs...")
-                device = self.find_device_by_attribute(
+                device = self.find_device_by_attribute_with_value(
                     endpoint=endpoint, attributes=["ip_addrs_private"], value=ip_address, action_result=action_result
                 )
 
@@ -493,7 +497,7 @@ class AutomoxConnector(BaseConnector):
         hostname = action.params.aux_params["hostname"]
 
         try:
-            device = self.find_device_by_attribute(endpoint, attributes=["name"], value=hostname, action_result=action_result)
+            device = self.find_device_by_attribute_with_value(endpoint, attributes=["name"], value=hostname, action_result=action_result)
 
             if not device:
                 return action_result.set_status(phantom.APP_ERROR, f"Device with hostname {hostname} not found")
