@@ -703,13 +703,12 @@ class AutomoxConnector(BaseConnector):
 
         action_execution_status = phantom.APP_SUCCESS
 
-        if action_id in action_mapping:
+        if action_id not in action_mapping:
+            self.debug_print("Action ID not found in action_mapping: ", action_id)
+        else:
             action_object = action_mapping[action_id]
             self.debug_print("Executing action function: ", action_object.handle_function)
             action_execution_status = action_object.handle_function(action_object)
-        else:
-            self.debug_print("Action ID not found in action_mapping: ", action_id)
-
         return action_execution_status
 
     def finalize(self) -> int:
