@@ -731,7 +731,7 @@ def main():
     username = args.username
     password = args.password
 
-    if username is not None and password is None:
+    if username and not password:
         # User specified a username but not a password, so ask
         import getpass
 
