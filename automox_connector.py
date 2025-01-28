@@ -590,7 +590,6 @@ class AutomoxConnector(BaseConnector):
         action_mapping = {
             "test_connectivity": AutomoxConnector.AutomoxAction(
                 base_endpoint=AUTOMOX_USERS_SELF_ENDPOINT,
-                # handle_function=self._handle_test_connectivity
                 handle_function=self._handle_generic,
                 fetch_function=self._make_rest_call,
             ),
@@ -684,8 +683,6 @@ class AutomoxConnector(BaseConnector):
             "update_device": AutomoxConnector.AutomoxAction(
                 base_endpoint=AUTOMOX_DEVICE_SPECIFIC_ENDPOINT,
                 handle_function=self._handle_update_device,
-                # fetch_function=self._make_rest_call,
-                # fetch_function_method="put",
                 params=Params(
                     query_params={"o": param.get("org_id")},
                     path_params={"device_id": param.get("device_id")},
