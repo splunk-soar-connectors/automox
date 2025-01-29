@@ -147,17 +147,21 @@ class AutomoxConnector(BaseConnector):
         return phantom.APP_SUCCESS
 
     def _get_endpoint(self, action: AutomoxAction) -> str:
-        path_params, query_params = action.params.get_formatted_params()
         return self._build_url(
             base_endpoint=action.base_endpoint,
-            path_params=path_params,
-            query_params=query_params
+            action=action
         )
 
-    def _build_url(self, base_endpoint: str, path_params: Dict[str, Any] = {}, query_params: Dict[str, Any] = {}) -> str:
+    def _build_url(self, base_endpoint: str, action: AutomoxAction) -> str:
         """
         Constructs a full URL by replacing placeholders in the base endpoint and appending query parameters
+
+        Args:
+            base_endpoint (str): Base API endpoint for the action
+            action (AutomoxAction): Action object containing parameters
         """
+        path_params, query_params = action.params.get_formatted_params()
+
         # Replace path params
         if path_params:
             for key, value in path_params.items():
