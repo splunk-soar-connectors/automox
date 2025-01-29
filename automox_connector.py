@@ -147,12 +147,12 @@ class AutomoxConnector(BaseConnector):
         return phantom.APP_SUCCESS
 
     def _get_endpoint(self, action: AutomoxAction) -> str:
-        return self._build_url(
+        return self._build_url_for_action(
             base_endpoint=action.base_endpoint,
             action=action
         )
 
-    def _build_url(self, base_endpoint: str, action: AutomoxAction) -> str:
+    def _build_url_for_action(self, base_endpoint: str, action: AutomoxAction) -> str:
         """
         Constructs a full URL by replacing placeholders in the base endpoint and appending query parameters
 
