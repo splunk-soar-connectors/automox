@@ -11,7 +11,20 @@ from bs4 import BeautifulSoup
 from phantom.action_result import ActionResult
 from phantom.base_connector import BaseConnector
 
-from automox_consts import *
+from automox_consts import (
+    AUTOMOX_COMMAND_QUEUE_LIST_ENDPOINT,
+    AUTOMOX_CONSOLE_API_URL,
+    AUTOMOX_DEVICE_LIST_ENDPOINT,
+    AUTOMOX_DEVICE_LIST_PACKAGES_ENDPOINT,
+    AUTOMOX_DEVICE_SPECIFIC_ENDPOINT,
+    AUTOMOX_GROUPS_LIST_ENDPOINT,
+    AUTOMOX_ORGS_LIST_ENDPOINT,
+    AUTOMOX_POLICY_LIST_ENDPOINT,
+    AUTOMOX_POLICY_RUN_ENDPOINT,
+    AUTOMOX_REMOVE_USER_FROM_ACCOUNT_ENDPOINT,
+    AUTOMOX_USERS_LIST_ENDPOINT,
+    AUTOMOX_USERS_SELF_ENDPOINT,
+)
 
 
 class RetVal(tuple):
