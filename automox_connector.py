@@ -43,66 +43,71 @@ class Params:
     """
 
     def __init__(self, query_params: Dict[str, str] = {}, path_params: Dict[str, str] = {}, **kwargs) -> None:
-        self.query_params = query_params
-        self.path_params = path_params
-        self.aux_params = dict(kwargs)
+        self._query_params = query_params
+        self._path_params = path_params
+        self._aux_params = dict(kwargs)
+
+    def get_query_params(self) -> Dict[str, str]:
+        """Get a copy of query parameters"""
+        return self._query_params.copy()
+
+    def get_path_params(self) -> Dict[str, str]:
+        """Get a copy of path parameters"""
+        return self._path_params.copy()
+
+    def get_aux_params(self) -> Dict[str, Any]:
+        """Get a copy of auxiliary parameters"""
+        return self._aux_params.copy()
+
+    def get_param(self, param_type: str, key: str, default: Any = None) -> Any:
+        """Get a specific parameter value by type and key"""
+        if param_type == "query":
+            return self._query_params.get(key, default)
+        elif param_type == "path":
+            return self._path_params.get(key, default)
+        elif param_type == "aux":
+            return self._aux_params.get(key, default)
+        return default
 
     def to_dict(self) -> Dict[str, Dict[str, str]]:
-        return {"query_params": self.query_params, "path_params": self.path_params}
+        """Convert parameters to dictionary format"""
+        return {
+            "query_params": self.get_query_params(),
+            "path_params": self.get_path_params()
+        }
+
+    def get_formatted_params(self) -> Tuple[Dict[str, str], Dict[str, str]]:
+        """Get formatted parameters for URL building"""
+        return self.get_path_params(), self.get_query_params()
 
 
 class Device(TypedDict, total=False):
-    """Type definition for Automox device attributes
-
-    Attributes:
-        id (int): Device ID
-        name (str): Device hostname/name
-        display_name (str): Custom display name
-        ip_addrs (List[str]): List of public IP addresses
-        ip_addrs_private (List[str]): List of private IP addresses
-        os_family (str): Operating system family
-        os_name (str): Operating system name
-        os_version (str): Operating system version
-        server_group_id (int): Group ID the device belongs to
-        tags (List[str]): List of tags assigned to device
-        total_count (int): Total count for paginated responses
-        status (str): Device status
-        last_refresh (str): Last device refresh timestamp
-        custom_name (str): User-defined device name
-        exception (bool): Whether device has "exclude from reports" flag
-    """
-
-    id: int
-    name: str
-    display_name: str
-    ip_addrs: List[str]
-    ip_addrs_private: List[str]
-    os_family: str
-    os_name: str
-    os_version: str
-    server_group_id: int
-    tags: List[str]
-    total_count: int
-    status: str
-    last_refresh: str
-    custom_name: str
-    exception: bool
+    id: int  # {"description": "Device ID"}
+    name: str  # {"description": "Device hostname/name"}
+    display_name: str  # {"description": "Custom display name"}
+    ip_addrs: List[str]  # {"description": "List of public IP addresses"}
+    ip_addrs_private: List[str]  # {"description": "List of private IP addresses"}
+    os_family: str  # {"description": "Operating system family"}
+    os_name: str  # {"description": "Operating system name"}
+    os_version: str  # {"description": "Operating system version"}
+    server_group_id: int  # {"description": "Group ID the device belongs to"}
+    tags: List[str]  # {"description": "List of tags assigned to device"}
+    total_count: int  # {"description": "Total count for paginated responses"}
+    status: str  # {"description": "Device status"}
+    last_refresh: str  # {"description": "Last device refresh timestamp"}
+    custom_name: str  # {"description": "User-defined device name"}
+    exception: bool  # {"description": "Whether device has 'exclude from reports' flag"}
 
 
 class AutomoxConnector(BaseConnector):
 
     class AutomoxAction:
-        """
-        Inner class representing an Action with the Automox API.
-
-        Attributes:
-            base_endpoint (str): Base API endpoint for the action
-            params (Params): Parameters for the action
-            summary_key (str): Key used for action summary
-            handle_function (callable): Function to handle the action
-            fetch_function (callable): Function to fetch data from API
-            fetch_function_method (str): HTTP method for the fetch function
-        """
+        base_endpoint: str  # {"description": "Base API endpoint for the action"}
+        params: Params  # {"description": "Parameters for the API request"}
+        summary_key: str  # {"description": "Key used in action summary response"}
+        handle_function: callable  # {"description": "Function that handles the action logic"}
+        fetch_function: callable  # {"description": "Function that fetches data from the API"}
+        fetch_function_method: str  # {"description": "HTTP method to use for the API request", "allowed_values": ["get", "post", "put", "delete"]}
 
         def __init__(
             self,
@@ -142,8 +147,11 @@ class AutomoxConnector(BaseConnector):
         return phantom.APP_SUCCESS
 
     def _get_endpoint(self, action: AutomoxAction) -> str:
+        path_params, query_params = action.params.get_formatted_params()
         return self._build_url(
-            base_endpoint=action.base_endpoint, path_params=action.params.path_params, query_params=action.params.query_params
+            base_endpoint=action.base_endpoint,
+            path_params=path_params,
+            query_params=query_params
         )
 
     def _build_url(self, base_endpoint: str, path_params: Dict[str, Any] = {}, query_params: Dict[str, Any] = {}) -> str:
@@ -253,26 +261,23 @@ class AutomoxConnector(BaseConnector):
 
     # Pagination support
     def _fetch_paginated_data(
-        self, endpoint: str, params: Dict[str, Any], action_result: ActionResult, headers: Dict[str, str]
+        self, endpoint: str, params: Union[Params, Dict[str, Any]], action_result: ActionResult, headers: Dict[str, str]
     ) -> Tuple[int, List[Dict[str, Any]]]:
         """
         Fetches all pages of data from a paginated API endpoint.
-
-        Args:
-            endpoint (str): API endpoint to fetch data from
-            params (dict): Query parameters for the request
-            action_result (ActionResult): Action result object for status tracking
-            headers (dict): Request headers
-
-        Returns:
-            Tuple[int, list]: Status code and list of fetched items
         """
-        params = self.first_page(params)  # add the initial pagination query params
-
+        # Convert params to Params object if it's a dict
+        params_obj = params if isinstance(params, Params) else Params(**params)
+        paginated_params = self.first_page(params_obj)
         all_items = []
 
         while True:
-            ret_val, response = self._make_rest_call(endpoint=endpoint, action_result=action_result, params=params, headers=headers)
+            ret_val, response = self._make_rest_call(
+                endpoint=endpoint, 
+                action_result=action_result, 
+                params=paginated_params.get_query_params(),
+                headers=headers
+            )
 
             if phantom.is_fail(ret_val):
                 return phantom.APP_ERROR, []
@@ -282,30 +287,24 @@ class AutomoxConnector(BaseConnector):
             if len(response) < self._page_limit:
                 break
 
-            # update the query params to get the next page
-            params = self.next_page(params)
-            self.debug_print(f"Fetching next page with updated query params: {params}")
+            paginated_params = self.next_page(paginated_params)
 
         return phantom.APP_SUCCESS, all_items
 
-    def first_page(self, params=None) -> dict:
-        if params is None:
-            params = {}
-        params.update({"limit": self._page_limit, "page": 0})
-        return params
+    def first_page(self, params: Union[Params, Dict[str, Any]]) -> Params:
+        """Initialize pagination parameters"""
+        if not isinstance(params, Params):
+            params = Params(**params)
+        query_params = params.get_query_params()
+        query_params.update({"limit": self._page_limit, "page": 0})
+        return Params(query_params=query_params, path_params=params.get_path_params())
 
     @staticmethod
-    def next_page(params: Dict[str, Any]) -> Dict[str, Any]:
-        new_params = params.copy()
-        new_params["page"] += 1
-        return new_params
-
-    @staticmethod
-    def _is_valid_number(value: Any) -> bool:
-        """
-        Check if value is not null or number to prevent 0 from being removed
-        """
-        return isinstance(value, (int, float)) or not None
+    def next_page(params: Params) -> Params:
+        """Get parameters for the next page"""
+        query_params = params.get_query_params()
+        query_params["page"] = query_params.get("page", 0) + 1
+        return Params(query_params=query_params, path_params=params.get_path_params())
 
     def _get_total_device_count(self, endpoint: str, action_result: ActionResult) -> int:
         ret_val, response = self._make_rest_call(
@@ -418,9 +417,12 @@ class AutomoxConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(action.params.to_dict()))
         endpoint = self._get_endpoint(action)
 
+        # Convert params to Params object if it's a dict
+        params = action.params if isinstance(action.params, Params) else Params(**action.params)
+
         fetch_function_kwargs = {
             "endpoint": endpoint,
-            "params": action.params.query_params,
+            "params": params,
             "action_result": action_result,
             "headers": self._headers,
         }
@@ -428,7 +430,7 @@ class AutomoxConnector(BaseConnector):
         # Include POST body if fetch_function_method is POST
         if action.fetch_function_method.lower() == "post":
             fetch_function_kwargs["method"] = "post"
-            fetch_function_kwargs["data"] = json.dumps(action.params.aux_params.get("body"))
+            fetch_function_kwargs["data"] = json.dumps(params.get_param("aux", "body"))
 
         # Do a DELETE if fetch_function_method is DELETE
         if action.fetch_function_method.lower() == "delete":
@@ -462,7 +464,7 @@ class AutomoxConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(action.params.to_dict()))
         endpoint = self._get_endpoint(action)
 
-        ip_address = action.params.aux_params["ip_address"]
+        ip_address = action.params.get_param("aux", "ip_address")
 
         # Validate IP address format using regex
         ip_pattern = re.compile(r"^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$")
@@ -508,7 +510,7 @@ class AutomoxConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(action.params.to_dict()))
         endpoint = self._get_endpoint(action)
 
-        hostname = action.params.aux_params["hostname"]
+        hostname = action.params.get_param("aux", "hostname")
 
         try:
             device = self.find_device_by_attribute_with_value(endpoint, attributes=["name"], value=hostname, action_result=action_result)
@@ -539,10 +541,10 @@ class AutomoxConnector(BaseConnector):
         endpoint = self._get_endpoint(action)
 
         # Extract aux params for POST body
-        exception = action.params.aux_params["exception"]
-        server_group_id = action.params.aux_params["server_group_id"]
-        tags = action.params.aux_params.get("tags")
-        custom_name = action.params.aux_params.get("custom_name")
+        exception = action.params.get_param("aux", "exception")
+        server_group_id = action.params.get_param("aux", "server_group_id")
+        tags = action.params.get_param("aux", "tags")
+        custom_name = action.params.get_param("aux", "custom_name")
 
         # Validate and process tags
         tag_list = []
