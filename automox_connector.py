@@ -424,8 +424,7 @@ class AutomoxConnector(BaseConnector):
         max_pages = ceil(total_devices / self._page_limit)
         paginated_params = self.first_page(params)
         
-        current_page = 0
-        while current_page < max_pages:
+        for current_page in range(max_pages):
             self.debug_print(f"Fetching devices with params: {paginated_params.to_dict()}")
 
             ret_val, devices = self._make_rest_call(
