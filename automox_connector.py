@@ -713,7 +713,7 @@ class AutomoxConnector(BaseConnector):
             
             # Format tags if present
             if "tags" in user:
-                formatted_user["tags"] = json.dumps(user["tags"])
+                formatted_user.update(self._format_list_fields(user, "tags"))
 
             action_result.add_data(formatted_user)
 
