@@ -324,6 +324,53 @@ class AutomoxConnector(BaseConnector):
         
         return Params(query_params=query_params, path_params=params.get_path_params())
 
+    def _format_for_display(self, value: Any) -> str:
+        """
+        Format any value into a human-readable string representation.
+        This is because the table display in SOAR sanitizes the data and does not display nested json nicely.
+        
+        Args:
+            value: Any value to format
+            
+        Returns:
+            str: Human-readable string representation
+        """
+        if isinstance(value, list):
+            # If list contains dicts, extract key info
+            if value and isinstance(value[0], dict):
+                # For rbac_roles, use organization_id instead of id
+                if all(isinstance(x, dict) and "name" in x and "organization_id" in x for x in value):
+                    return ", ".join(f"{x['name']} ({x['organization_id']})" for x in value)
+                # Try common key combinations for name/id pairs
+                if all(isinstance(x, dict) and "name" in x and "id" in x for x in value):
+                    return ", ".join(f"{x['name']} ({x['id']})" for x in value)
+                # Fallback to first value or str representation
+                return ", ".join(str(next(iter(x.values()))) if x else str(x) for x in value)
+            # Simple list - join with commas
+            return ", ".join(str(x) for x in value)
+        
+        if isinstance(value, dict):
+            # Extract the most meaningful parts of a dict
+            meaningful_keys = ["name", "id", "value", "type"]
+            values = []
+            for key in meaningful_keys:
+                if key in value:
+                    values.append(f"{value[key]}")
+            if values:
+                return " - ".join(values)
+            # Fallback to first value if no meaningful keys found
+            return str(next(iter(value.values()))) if value else ""
+            
+        # Handle basic types
+        return str(value)
+
+    def _format_list_fields(self, data: Dict[str, Any], field_name: str) -> Dict[str, str]:
+        """Format list fields into a readable string representation for table display"""
+        result = {}
+        if field_name in data:
+            result[field_name] = self._format_for_display(data[field_name])
+        return result
+
     def _get_total_device_count(self, endpoint: str, action_result: ActionResult) -> int:
         ret_val, response = self._make_rest_call(
             endpoint=endpoint,
@@ -632,6 +679,49 @@ class AutomoxConnector(BaseConnector):
         action_result.add_data(response)
 
         return action_result.set_status(phantom.APP_SUCCESS)
+    
+    def _handle_list_organization_users(self, action: AutomoxAction) -> int:
+        """
+        Handles the list_organization_users action.
+
+        Args:
+            action (AutomoxAction): Action configuration object
+
+        Returns:
+            int: Action status code (success/failure)
+        """
+        self.save_progress(f"In action handler for: {self.get_action_identifier()}")
+
+        action_result = self.add_action_result(ActionResult(action.params.to_dict()))
+        endpoint = self._get_endpoint(action)
+
+        ret_val, users = self._fetch_paginated_data(endpoint, action.params, action_result, self._headers)
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+        
+        for user in users:
+            formatted_user = user.copy()
+
+            # Combine first and last name
+            if "firstname" in user and "lastname" in user:
+                formatted_user["name"] = f"{user['firstname']} {user['lastname']}"
+
+            # Format the orgs and rbac_roles as JSON strings
+            formatted_user.update(self._format_list_fields(user, "orgs"))
+            formatted_user.update(self._format_list_fields(user, "rbac_roles"))
+            
+            # Format tags if present
+            if "tags" in user:
+                formatted_user["tags"] = json.dumps(user["tags"])
+
+            action_result.add_data(formatted_user)
+
+        if action.summary_key:
+            summary = action_result.update_summary({})
+            summary[action.summary_key] = len(users)
+
+        return action_result.set_status(phantom.APP_SUCCESS)
 
     def handle_action(self, param: Dict[str, Any]) -> int:
         """
@@ -701,7 +791,7 @@ class AutomoxConnector(BaseConnector):
             ),
             "list_organization_users": AutomoxConnector.AutomoxAction(
                 base_endpoint=AUTOMOX_USERS_LIST_ENDPOINT,
-                handle_function=self._handle_generic,
+                handle_function=self._handle_list_organization_users,
                 fetch_function=self._fetch_paginated_data,
                 params=Params(query_params={"o": param.get("org_id")}),
                 summary_key="total_users",
