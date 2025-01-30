@@ -116,18 +116,19 @@ class AutomoxConnector(BaseConnector):
             handle_function: callable,
             fetch_function: callable = None,
             fetch_function_method: str = "get",
-            params: Params = None,
+            params: Optional[Union[Params, Dict[str, Any]]] = None,
             summary_key: str = None,
         ):
-            if params is None:
-                params = Params()
-
+            # Convert dict to Params at creation time
+            self.params = Params() if params is None else (
+                params if isinstance(params, Params) else Params(**params)
+            )
             self.base_endpoint = base_endpoint
             self.params = params
             self.summary_key = summary_key
             self.handle_function = handle_function
             self.fetch_function = fetch_function
-            self.fetch_function_method = fetch_function_method
+            self.fetch_function_method = fetch_function_method.lower()
 
     def __init__(self):
         super(AutomoxConnector, self).__init__()
@@ -270,20 +271,21 @@ class AutomoxConnector(BaseConnector):
         return self._process_response(r, action_result)
 
     def _fetch_paginated_data(
-        self, endpoint: str, params: Union[Params, Dict[str, Any]], action_result: ActionResult, headers: Dict[str, str]
+        self, 
+        endpoint: str, 
+        params: Union[Params, Dict[str, Any]], 
+        action_result: ActionResult, 
+        headers: Dict[str, str]
     ) -> Tuple[int, List[Dict[str, Any]]]:
-        """
-        Fetches all pages of data from a paginated API endpoint.
-        """
-        # Convert params to Params object if it's a dict
+        """Fetches all pages of data from a paginated API endpoint."""
         params_obj = params if isinstance(params, Params) else Params(**params)
         paginated_params = self.first_page(params_obj)
         all_items = []
 
         while True:
             ret_val, response = self._make_rest_call(
-                endpoint=endpoint, 
-                action_result=action_result, 
+                endpoint=endpoint,
+                action_result=action_result,
                 params=paginated_params.get_query_params(),
                 headers=headers
             )
@@ -296,6 +298,7 @@ class AutomoxConnector(BaseConnector):
             if len(response) < self._page_limit:
                 break
 
+            self.debug_print("Getting next page...")
             paginated_params = self.next_page(paginated_params)
 
         return phantom.APP_SUCCESS, all_items
@@ -304,18 +307,23 @@ class AutomoxConnector(BaseConnector):
         """Initialize pagination parameters"""
         if not isinstance(params, Params):
             params = Params(**params)
-
+        
         query_params = params.get_query_params()
-        query_params.update({"limit": self._page_limit, "page": 0})
-
+        query_params.update({
+            "limit": self._page_limit,
+            "page": 0
+        })
+        
         return Params(query_params=query_params, path_params=params.get_path_params())
 
     @staticmethod
     def next_page(params: Params) -> Params:
         """Get parameters for the next page"""
         query_params = params.get_query_params()
-        query_params["page"] = str(query_params.get("page", 0) + 1)
-
+        current_page = query_params.get("page", 0)
+        query_params["page"] = current_page + 1
+        query_params["limit"] = query_params.get("limit", 100)
+        
         return Params(query_params=query_params, path_params=params.get_path_params())
 
     def _get_total_device_count(self, endpoint: str, action_result: ActionResult) -> int:
@@ -356,27 +364,44 @@ class AutomoxConnector(BaseConnector):
                     return device
         return None
 
+    @staticmethod
+    def _is_valid_number(value: Any) -> bool:
+        """
+        Check if value is valid (not None and either a number or any other non-None type)
+        
+        Args:
+            value: Value to check
+            
+        Returns:
+            bool: True if value is valid, False otherwise
+        """
+        return value is not None
+
     def remove_null_values(self, item: Union[Dict[str, Any], List[Any], Any]) -> Union[Dict[str, Any], List[Any], Any]:
         """
         Recursively remove null values from a dictionary or list
         """
         if isinstance(item, dict):
-            return dict(
-                (key, self.remove_null_values(value))  #@todo: are you meaning to do a dict comprehension instead?
+            return {
+                key: self.remove_null_values(value)
                 for key, value in item.items()
                 if self._is_valid_number(value) and self._is_valid_number(self.remove_null_values(value))
-            )
+            }
         elif isinstance(item, list):
             return [
                 self.remove_null_values(value)
                 for value in item
                 if self._is_valid_number(value) and self._is_valid_number(self.remove_null_values(value))
             ]
-        else:
-            return item
+        return item
 
     def find_device_by_attribute_with_value(
-        self, endpoint: str, attributes: List[str], value: str, action_result: ActionResult
+        self, 
+        endpoint: str, 
+        attributes: List[str], 
+        value: str, 
+        action_result: ActionResult,
+        params: Optional[Union[Params, Dict[str, Any]]] = None
     ) -> Optional[Device]:
         """
         Searches through all devices to find one matching specified attributes with given value.
@@ -386,6 +411,7 @@ class AutomoxConnector(BaseConnector):
             attributes (List[str]): Device attributes to check
             value (str): Value to match against the attributes
             action_result (ActionResult): Action result object for status tracking
+            params (Optional[Union[Params, Dict[str, Any]]]): Parameters for the request
 
         Returns:
             Optional[Device]: Matching device dictionary or None if not found
@@ -394,18 +420,22 @@ class AutomoxConnector(BaseConnector):
             Exception: If API call fails
         """
         total_devices = self._get_total_device_count(endpoint, action_result)
-
         if total_devices is None:
             return None
 
         max_pages = ceil(total_devices / self._page_limit)
-        params = self.first_page() #@todo: Seems like this will fail
+        paginated_params = self.first_page(params)
+        
+        current_page = 0
+        while current_page < max_pages:
+            self.debug_print(f"Fetching devices with params: {paginated_params.to_dict()}")
 
-        for current_page in range(max_pages):
-            # get a list of devices to parse
-            self.debug_print("Fetching devices")
-
-            ret_val, devices = self._make_rest_call(endpoint=endpoint, action_result=action_result, params=params, headers=self._headers)
+            ret_val, devices = self._make_rest_call(
+                endpoint=endpoint,
+                action_result=action_result,
+                params=paginated_params.get_query_params(),
+                headers=self._headers
+            )
 
             if phantom.is_fail(ret_val):
                 self.debug_print(f"Failed to get devices: {action_result.get_message()}")
@@ -418,10 +448,10 @@ class AutomoxConnector(BaseConnector):
             if len(devices) < self._page_limit:
                 break
 
-            params = self.next_page(params)
+            paginated_params = self.next_page(paginated_params)
+            current_page += 1
 
         self.debug_print(f"Device relating to {value} not found")
-
         return None
 
     # Action logic
@@ -430,13 +460,10 @@ class AutomoxConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(action.params.to_dict()))
         endpoint = self._get_endpoint(action)
-        params = action.params if isinstance(action.params, Params) else Params(**action.params) # Convert params to Params object if it's a dict
-        # @todo: The above seems odd because you shouldn't allow an object to be two different types,
-        # instead ensure at creation time that it is a Params object or convert as needed there
 
         fetch_function_kwargs = {
             "endpoint": endpoint,
-            "params": params,
+            "params": action.params.get_query_params(),
             "action_result": action_result,
             "headers": self._headers,
         }
@@ -444,7 +471,7 @@ class AutomoxConnector(BaseConnector):
         # Include POST body if fetch_function_method is POST
         if action.fetch_function_method.lower() == "post":
             fetch_function_kwargs["method"] = "post"
-            fetch_function_kwargs["data"] = json.dumps(params.get_aux_param_by_key("body"))
+            fetch_function_kwargs["data"] = json.dumps(action.params.get_aux_param_by_key("body"))
 
         # Do a DELETE if fetch_function_method is DELETE
         if action.fetch_function_method.lower() == "delete":
@@ -485,16 +512,24 @@ class AutomoxConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, f"Invalid IP address format: {ip_address}")
 
         try:
-            # Use find_device_by_attribute_with_value to find the device by Public IP
+            # Pass the params to find_device_by_attribute_with_value
             device = self.find_device_by_attribute_with_value(
-                endpoint=endpoint, attributes=["ip_addrs"], value=ip_address, action_result=action_result
+                endpoint=endpoint, 
+                attributes=["ip_addrs"], 
+                value=ip_address, 
+                action_result=action_result,
+                params=action.params
             )
 
             # if we didn't find a match using the Public IP, try private IPs
             if not device:
                 self.save_progress("Device not found using public IP. Trying private IPs...")
                 device = self.find_device_by_attribute_with_value(
-                    endpoint=endpoint, attributes=["ip_addrs_private"], value=ip_address, action_result=action_result
+                    endpoint=endpoint, 
+                    attributes=["ip_addrs_private"], 
+                    value=ip_address, 
+                    action_result=action_result,
+                    params=action.params
                 )
 
             # if we don't find any matches at all
@@ -525,9 +560,16 @@ class AutomoxConnector(BaseConnector):
         endpoint = self._get_endpoint(action)
 
         hostname = action.params.get_aux_param_by_key("hostname")
+        self.debug_print(f"Searching for device with hostname: {hostname}")
 
         try:
-            device = self.find_device_by_attribute_with_value(endpoint, attributes=["name"], value=hostname, action_result=action_result)
+            device = self.find_device_by_attribute_with_value(
+                endpoint=endpoint, 
+                attributes=["name"], 
+                value=hostname, 
+                action_result=action_result,
+                params=action.params
+            )
 
             if not device:
                 return action_result.set_status(phantom.APP_ERROR, f"Device with hostname {hostname} not found")
@@ -624,6 +666,8 @@ class AutomoxConnector(BaseConnector):
                 base_endpoint=AUTOMOX_USERS_SELF_ENDPOINT,
                 handle_function=self._handle_generic,
                 fetch_function=self._make_rest_call,
+                params=Params(),
+                fetch_function_method="get",
             ),
             "list_groups": AutomoxConnector.AutomoxAction(
                 base_endpoint=AUTOMOX_GROUPS_LIST_ENDPOINT,
@@ -655,6 +699,7 @@ class AutomoxConnector(BaseConnector):
                 base_endpoint=AUTOMOX_ORGS_LIST_ENDPOINT,
                 handle_function=self._handle_generic,
                 fetch_function=self._make_rest_call,
+                params=Params(),
                 summary_key="total_orgs",
             ),
             "list_organization_users": AutomoxConnector.AutomoxAction(
@@ -805,14 +850,13 @@ def main():
         print(json.dumps(in_json, indent=4))
 
         connector = AutomoxConnector()
-        action = AutomoxAction() # @todo: This appears to not pass any parameters
         connector.print_progress_message = True
 
         if session_id is not None:
             in_json["user_session_token"] = session_id
             connector._set_csrf_info(csrftoken, headers["Referer"])
 
-        ret_val = connector._handle_action(action, None) # @todo: and here it passes the action instead of params? Also to an uknown method?
+        ret_val = connector._handle_action(json.dumps(in_json), None)
         print(json.dumps(json.loads(ret_val), indent=4))
 
     exit(0)
