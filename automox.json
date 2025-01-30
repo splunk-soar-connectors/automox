@@ -742,7 +742,7 @@
                     "data_path": "action_result.parameter.org_id",
                     "data_type": "numeric",
                     "contains": [],
-                    "column_name": "org_id",
+                    "column_name": "provided_org_id",
                     "column_order": 0
                 },
                 {
@@ -788,10 +788,28 @@
                     "column_order": 7
                 },
                 {
+                    "data_path": "action_result.data.*.*.saml_enabled",
+                    "data_type": "string",
+                    "column_name": "saml_enabled",
+                    "column_order": 8
+                },
+                {
+                    "data_path": "action_result.data.*.*.sso_enabled",
+                    "data_type": "string",
+                    "column_name": "sso_enabled",
+                    "column_order": 9
+                },
+                {
+                    "data_path": "action_result.data.*.*.rbac_roles.*.name",
+                    "data_type": "string",
+                    "column_name": "rbac_roles",
+                    "column_order": 10
+                },
+                {
                     "data_path": "action_result.data.*.*.tags",
                     "data_type": "string",
                     "column_name": "tags",
-                    "column_order": 8
+                    "column_order": 11
                 },
                 {
                     "data_path": "action_result.message",
