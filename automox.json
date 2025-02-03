@@ -99,21 +99,21 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.parameter.org_id",
+                    "data_path": "action_result.parameter.query_params.o",
                     "data_type": "numeric",
                     "contains": [],
                     "column_name": "provided_org_id",
                     "column_order": 0
                 },
                 {
-                    "data_path": "action_result.parameter.device_id",
+                    "data_path": "action_result.parameter.aux_params.body.serverId",
                     "data_type": "numeric",
                     "contains": [],
                     "column_name": "provided_device_id",
                     "column_order": 1
                 },
                 {
-                    "data_path": "action_result.parameter.policy_id",
+                    "data_path": "action_result.parameter.path_params.policy_id",
                     "data_type": "numeric",
                     "contains": [],
                     "column_name": "provided_policy_id",
