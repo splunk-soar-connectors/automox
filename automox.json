@@ -188,7 +188,7 @@
                 {
                     "data_path": "action_result.data.*.*.uuid",
                     "data_type": "string",
-                    "column_name": "uuid",
+                    "column_name": "policy_uuid",
                     "column_order": 3
                 },
                 {
@@ -278,7 +278,7 @@
                 {
                     "data_path": "action_result.data.*.*.uuid",
                     "data_type": "string",
-                    "column_name": "uuid",
+                    "column_name": "device_uuid",
                     "column_order": 3
                 },
                 {
@@ -392,7 +392,7 @@
                 {
                     "data_path": "action_result.data.*.*.uuid",
                     "data_type": "string",
-                    "column_name": "uuid",
+                    "column_name": "org_uuid",
                     "column_order": 3
                 },
                 {
@@ -932,7 +932,7 @@
                 {
                     "data_path": "action_result.data.*.uuid",
                     "data_type": "string",
-                    "column_name": "uuid",
+                    "column_name": "user_uuid",
                     "column_order": 3
                 },
                 {
