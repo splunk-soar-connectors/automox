@@ -284,6 +284,9 @@
                 {
                     "data_path": "action_result.data.*.*.name",
                     "data_type": "string",
+                    "contains": [
+                        "host name"
+                    ],
                     "column_name": "name",
                     "column_order": 4
                 },
@@ -302,12 +305,18 @@
                 {
                     "data_path": "action_result.data.*.*.ip_addrs",
                     "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ],
                     "column_name": "ip_addrs",
                     "column_order": 7
                 },
                 {
                     "data_path": "action_result.data.*.*.ip_addrs_private",
                     "data_type": "string",
+                    "contains": [
+                        "ip"
+                    ],
                     "column_name": "ip_addrs_private",
                     "column_order": 8
                 },
@@ -727,7 +736,7 @@
                     "data_path": "action_result.parameter.hostname",
                     "data_type": "string",
                     "contains": [
-                        "deviceHostname"
+                        "host name"
                     ],
                     "column_name": "provided_hostname",
                     "column_order": 0
@@ -759,7 +768,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.ip_addrs",
-                    "data_type": "numeric",
+                    "data_type": "string",
                     "contains": [
                         "ip"
                     ],
@@ -767,20 +776,25 @@
                     "column_order": 5
                 },
                 {
-                    "data_path": "action_result.data.*.last_logged_in_user",
+                    "data_path": "action_result.data.*.ip_addrs_private",
                     "data_type": "string",
                     "contains": [
-                        "sourceUserName",
-                        "destinationUserName"
+                        "ip"
                     ],
-                    "column_name": "Last logged in user",
+                    "column_name": "Private IPs",
                     "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.last_logged_in_user",
+                    "data_type": "string",
+                    "column_name": "Last logged in user",
+                    "column_order": 7
                 },
                 {
                     "data_path": "action_result.data.*.server_group_id",
                     "data_type": "numeric",
                     "column_name": "Server group IDs",
-                    "column_order": 7
+                    "column_order": 8
                 },
                 {
                     "data_path": "action_result.message",
