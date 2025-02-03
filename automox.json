@@ -182,7 +182,7 @@
                 {
                     "data_path": "action_result.data.*.*.id",
                     "data_type": "string",
-                    "column_name": "id",
+                    "column_name": "policy_id",
                     "column_order": 2
                 },
                 {
@@ -194,7 +194,7 @@
                 {
                     "data_path": "action_result.data.*.*.name",
                     "data_type": "string",
-                    "column_name": "name",
+                    "column_name": "policy_name",
                     "column_order": 4
                 },
                 {
@@ -287,7 +287,7 @@
                     "contains": [
                         "host name"
                     ],
-                    "column_name": "name",
+                    "column_name": "hostname",
                     "column_order": 4
                 },
                 {
@@ -380,7 +380,7 @@
                 {
                     "data_path": "action_result.data.*.*.name",
                     "data_type": "string",
-                    "column_name": "name",
+                    "column_name": "org_name",
                     "column_order": 2
                 },
                 {
@@ -488,27 +488,27 @@
                     "column_order": 3
                 },
                 {
+                    "data_path": "action_result.data.*.*.name",
+                    "data_type": "string",
+                    "column_name": "package_name",
+                    "column_order": 4
+                },
+                {
                     "data_path": "action_result.data.*.*.display_name",
                     "data_type": "string",
                     "column_name": "display_name",
-                    "column_order": 4
+                    "column_order": 5
                 },
                 {
                     "data_path": "action_result.data.*.*.id",
                     "data_type": "string",
                     "column_name": "package_id",
-                    "column_order": 5
+                    "column_order": 6
                 },
                 {
                     "data_path": "action_result.data.*.*.installed",
                     "data_type": "string",
                     "column_name": "installed",
-                    "column_order": 6
-                },
-                {
-                    "data_path": "action_result.data.*.*.name",
-                    "data_type": "string",
-                    "column_name": "name",
                     "column_order": 7
                 },
                 {
@@ -642,13 +642,13 @@
                 {
                     "data_path": "action_result.data.*.id",
                     "data_type": "numeric",
-                    "column_name": "Device ID",
+                    "column_name": "device_id",
                     "column_order": 3
                 },
                 {
                     "data_path": "action_result.data.*.uuid",
                     "data_type": "string",
-                    "column_name": "Device UUID",
+                    "column_name": "device_uuid",
                     "column_order": 4
                 },
                 {
@@ -657,25 +657,25 @@
                     "contains": [
                         "host name"
                     ],
-                    "column_name": "Hostname",
+                    "column_name": "hostname",
                     "column_order": 5
                 },
                 {
                     "data_path": "action_result.data.*.custom_name",
                     "data_type": "string",
-                    "column_name": "Custom Name",
+                    "column_name": "custom_name",
                     "column_order": 6
                 },
                 {
                     "data_path": "action_result.data.*.agent_version",
                     "data_type": "string",
-                    "column_name": "Agent Version",
+                    "column_name": "agent_version",
                     "column_order": 7
                 },
                 {
                     "data_path": "action_result.data.*.connected",
                     "data_type": "string",
-                    "column_name": "Connected?",
+                    "column_name": "connected?",
                     "column_order": 8
                 },
                 {
@@ -684,7 +684,7 @@
                     "contains": [
                         "ip"
                     ],
-                    "column_name": "Public IPs",
+                    "column_name": "public_IPs",
                     "column_order": 9
                 },
                 {
@@ -693,25 +693,25 @@
                     "contains": [
                         "ip"
                     ],
-                    "column_name": "Private IPs",
+                    "column_name": "private_IPs",
                     "column_order": 10
                 },
                 {
                     "data_path": "action_result.data.*.last_logged_in_user",
                     "data_type": "string",
-                    "column_name": "Last Logged In User",
+                    "column_name": "last_logged_in_user",
                     "column_order": 11
                 },
                 {
                     "data_path": "action_result.data.*.server_group_id",
                     "data_type": "numeric",
-                    "column_name": "Server Group ID",
+                    "column_name": "server_group_id",
                     "column_order": 12
                 },
                 {
                     "data_path": "action_result.data.*.organization_id",
                     "data_type": "numeric",
-                    "column_name": "Organization ID",
+                    "column_name": "org_id",
                     "column_order": 13
                 },
                 {
@@ -793,13 +793,13 @@
                 {
                     "data_path": "action_result.data.*.id",
                     "data_type": "numeric",
-                    "column_name": "Device ID",
+                    "column_name": "device_id",
                     "column_order": 3
                 },
                 {
                     "data_path": "action_result.data.*.connected",
                     "data_type": "string",
-                    "column_name": "Connection Status",
+                    "column_name": "connected?",
                     "column_order": 4
                 },
                 {
@@ -808,7 +808,7 @@
                     "contains": [
                         "ip"
                     ],
-                    "column_name": "Public IPs",
+                    "column_name": "public_IPs",
                     "column_order": 5
                 },
                 {
@@ -817,19 +817,19 @@
                     "contains": [
                         "ip"
                     ],
-                    "column_name": "Private IPs",
+                    "column_name": "private_IPs",
                     "column_order": 6
                 },
                 {
                     "data_path": "action_result.data.*.last_logged_in_user",
                     "data_type": "string",
-                    "column_name": "Last logged in user",
+                    "column_name": "last_logged_in_user",
                     "column_order": 7
                 },
                 {
                     "data_path": "action_result.data.*.server_group_id",
                     "data_type": "numeric",
-                    "column_name": "Server group IDs",
+                    "column_name": "server_group_id",
                     "column_order": 8
                 },
                 {
@@ -1074,13 +1074,13 @@
                 {
                     "data_path": "action_result.data.*.*.id",
                     "data_type": "string",
-                    "column_name": "id",
+                    "column_name": "group_id",
                     "column_order": 2
                 },
                 {
                     "data_path": "action_result.data.*.*.name",
                     "data_type": "string",
-                    "column_name": "name",
+                    "column_name": "group_name",
                     "column_order": 3
                 },
                 {
