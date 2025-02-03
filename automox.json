@@ -556,7 +556,7 @@
                 {
                     "data_path": "action_result.data.*.*.server_id",
                     "data_type": "string",
-                    "column_name": "server_id",
+                    "column_name": "device_id",
                     "column_order": 14
                 },
                 {
@@ -1294,7 +1294,7 @@
                 {
                     "data_path": "action_result.data.*.*.server_id",
                     "data_type": "numeric",
-                    "column_name": "server_id",
+                    "column_name": "device_id",
                     "column_order": 4
                 },
                 {
