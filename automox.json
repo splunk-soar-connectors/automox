@@ -887,7 +887,7 @@
                 {
                     "data_path": "action_result.data.*.id",
                     "data_type": "numeric",
-                    "column_name": "id",
+                    "column_name": "user_id",
                     "column_order": 2
                 },
                 {
@@ -905,6 +905,9 @@
                 {
                     "data_path": "action_result.data.*.email",
                     "data_type": "string",
+                    "contains": [
+                        "email"
+                    ],
                     "column_name": "email",
                     "column_order": 5
                 },
