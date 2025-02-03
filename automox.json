@@ -81,7 +81,7 @@
                     "order": 1,
                     "name": "device_id",
                     "id": 2,
-                    "param_name": "server_id"
+                    "param_name": "device_id"
                 },
                 "policy_id": {
                     "description": "Automox Policy ID",
@@ -102,21 +102,21 @@
                     "data_path": "action_result.parameter.org_id",
                     "data_type": "numeric",
                     "contains": [],
-                    "column_name": "org_id",
+                    "column_name": "provided_org_id",
                     "column_order": 0
                 },
                 {
                     "data_path": "action_result.parameter.device_id",
                     "data_type": "numeric",
                     "contains": [],
-                    "column_name": "device_id",
+                    "column_name": "provided_device_id",
                     "column_order": 1
                 },
                 {
                     "data_path": "action_result.parameter.policy_id",
                     "data_type": "numeric",
                     "contains": [],
-                    "column_name": "policy_id",
+                    "column_name": "provided_policy_id",
                     "column_order": 2
                 },
                 {
@@ -420,7 +420,7 @@
                     "data_path": "action_result.parameter.device_id",
                     "data_type": "numeric",
                     "contains": [],
-                    "column_name": "device_id",
+                    "column_name": "provided_device_id",
                     "column_order": 0
                 },
                 {
@@ -578,14 +578,14 @@
                     "data_path": "action_result.parameter.device_id",
                     "data_type": "numeric",
                     "contains": [],
-                    "column_name": "device_id",
+                    "column_name": "provided_device_id",
                     "column_order": 0
                 },
                 {
                     "data_path": "action_result.parameter.org_id",
                     "data_type": "numeric",
                     "contains": [],
-                    "column_name": "org_id",
+                    "column_name": "provided_org_id",
                     "column_order": 1
                 },
                 {
@@ -729,14 +729,14 @@
                     "contains": [
                         "deviceHostname"
                     ],
-                    "column_name": "hostname",
+                    "column_name": "provided_hostname",
                     "column_order": 0
                 },
                 {
                     "data_path": "action_result.parameter.org_id",
                     "data_type": "numeric",
                     "contains": [],
-                    "column_name": "org_id",
+                    "column_name": "provided_org_id",
                     "column_order": 1
                 },
                 {
@@ -945,15 +945,17 @@
                 {
                     "data_path": "action_result.parameter.ip_address",
                     "data_type": "string",
-                    "contains": [],
-                    "column_name": "ip_address",
+                    "contains": [
+                        "ip"
+                    ],
+                    "column_name": "provided_ip_address",
                     "column_order": 0
                 },
                 {
                     "data_path": "action_result.parameter.org_id",
                     "data_type": "numeric",
                     "contains": [],
-                    "column_name": "org_id",
+                    "column_name": "provided_org_id",
                     "column_order": 1
                 },
                 {
@@ -1230,14 +1232,14 @@
                     "data_path": "action_result.parameter.account_id",
                     "data_type": "string",
                     "contains": [],
-                    "column_name": "account_id",
+                    "column_name": "provided_account_id",
                     "column_order": 0
                 },
                 {
                     "data_path": "action_result.parameter.user_id",
                     "data_type": "string",
                     "contains": [],
-                    "column_name": "user_id",
+                    "column_name": "provided_user_id",
                     "column_order": 1
                 },
                 {
@@ -1355,42 +1357,42 @@
                     "data_path": "action_result.parameter.device_id",
                     "data_type": "numeric",
                     "contains": [],
-                    "column_name": "device_id",
+                    "column_name": "provided_device_id",
                     "column_order": 0
                 },
                 {
                     "data_path": "action_result.parameter.org_id",
                     "data_type": "numeric",
                     "contains": [],
-                    "column_name": "org_id",
+                    "column_name": "provided_org_id",
                     "column_order": 1
                 },
                 {
                     "data_path": "action_result.parameter.exception",
                     "data_type": "boolean",
                     "contains": [],
-                    "column_name": "exception",
+                    "column_name": "provided_exception",
                     "column_order": 2
                 },
                 {
                     "data_path": "action_result.parameter.server_group_id",
                     "data_type": "numeric",
                     "contains": [],
-                    "column_name": "server_group_id",
+                    "column_name": "provided_server_group_id",
                     "column_order": 3
                 },
                 {
                     "data_path": "action_result.parameter.tags",
                     "data_type": "string",
                     "contains": [],
-                    "column_name": "tags",
+                    "column_name": "provided_tags",
                     "column_order": 4
                 },
                 {
                     "data_path": "action_result.parameter.custom_name",
                     "data_type": "string",
                     "contains": [],
-                    "column_name": "custom_name",
+                    "column_name": "provided_custom_name",
                     "column_order": 5
                 },
                 {
@@ -1453,14 +1455,14 @@
                     "data_path": "action_result.parameter.device_id",
                     "data_type": "numeric",
                     "contains": [],
-                    "column_name": "device_id",
+                    "column_name": "provided_device_id",
                     "column_order": 0
                 },
                 {
                     "data_path": "action_result.parameter.org_id",
                     "data_type": "numeric",
                     "contains": [],
-                    "column_name": "org_id",
+                    "column_name": "provided_org_id",
                     "column_order": 1
                 },
                 {
