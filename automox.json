@@ -167,7 +167,7 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.parameter.org_id",
+                    "data_path": "action_result.parameter.query_params.o",
                     "data_type": "numeric",
                     "contains": [],
                     "column_name": "provided_org_id",
@@ -257,7 +257,7 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.parameter.org_id",
+                    "data_path": "action_result.parameter.query_params.o",
                     "data_type": "string",
                     "contains": [],
                     "column_name": "provided_org_id",
@@ -426,14 +426,14 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.parameter.device_id",
+                    "data_path": "action_result.parameter.path_params.device_id",
                     "data_type": "numeric",
                     "contains": [],
                     "column_name": "provided_device_id",
                     "column_order": 0
                 },
                 {
-                    "data_path": "action_result.parameter.org_id",
+                    "data_path": "action_result.parameter.query_params.o",
                     "data_type": "numeric",
                     "contains": [],
                     "column_name": "provided_org_id",
@@ -584,14 +584,14 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.parameter.device_id",
+                    "data_path": "action_result.parameter.path_params.device_id",
                     "data_type": "numeric",
                     "contains": [],
                     "column_name": "provided_device_id",
                     "column_order": 0
                 },
                 {
-                    "data_path": "action_result.parameter.org_id",
+                    "data_path": "action_result.parameter.query_params.o",
                     "data_type": "numeric",
                     "contains": [],
                     "column_name": "provided_org_id",
@@ -733,7 +733,7 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.parameter.hostname",
+                    "data_path": "action_result.parameter.aux_params.hostname",
                     "data_type": "string",
                     "contains": [
                         "host name"
@@ -742,7 +742,7 @@
                     "column_order": 0
                 },
                 {
-                    "data_path": "action_result.parameter.org_id",
+                    "data_path": "action_result.parameter.query_params.o",
                     "data_type": "numeric",
                     "contains": [],
                     "column_name": "provided_org_id",
@@ -836,7 +836,7 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.parameter.org_id",
+                    "data_path": "action_result.parameter.query_params.o",
                     "data_type": "numeric",
                     "contains": [],
                     "column_name": "provided_org_id",
@@ -957,7 +957,7 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.parameter.ip_address",
+                    "data_path": "action_result.parameter.aux_params.ip_address",
                     "data_type": "string",
                     "contains": [
                         "ip"
@@ -966,7 +966,7 @@
                     "column_order": 0
                 },
                 {
-                    "data_path": "action_result.parameter.org_id",
+                    "data_path": "action_result.parameter.query_params.o",
                     "data_type": "numeric",
                     "contains": [],
                     "column_name": "provided_org_id",
@@ -1020,7 +1020,7 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.parameter.org_id",
+                    "data_path": "action_result.parameter.query_params.o",
                     "data_type": "numeric",
                     "contains": [],
                     "column_name": "provided_org_id",
@@ -1119,14 +1119,14 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.parameter.device_id",
+                    "data_path": "action_result.parameter.path_params.device_id",
                     "data_type": "numeric",
                     "contains": [],
                     "column_name": "provided_device_id",
                     "column_order": 0
                 },
                 {
-                    "data_path": "action_result.parameter.org_id",
+                    "data_path": "action_result.parameter.query_params.o",
                     "data_type": "numeric",
                     "contains": [],
                     "column_name": "provided_org_id",
@@ -1243,14 +1243,14 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.parameter.account_id",
+                    "data_path": "action_result.parameter.path_params.account_id",
                     "data_type": "string",
                     "contains": [],
                     "column_name": "provided_account_id",
                     "column_order": 0
                 },
                 {
-                    "data_path": "action_result.parameter.user_id",
+                    "data_path": "action_result.parameter.path_params.user_id",
                     "data_type": "string",
                     "contains": [],
                     "column_name": "provided_user_id",
@@ -1368,42 +1368,42 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.parameter.device_id",
+                    "data_path": "action_result.parameter.path_params.device_id",
                     "data_type": "numeric",
                     "contains": [],
                     "column_name": "provided_device_id",
                     "column_order": 0
                 },
                 {
-                    "data_path": "action_result.parameter.org_id",
+                    "data_path": "action_result.parameter.query_params.o",
                     "data_type": "numeric",
                     "contains": [],
                     "column_name": "provided_org_id",
                     "column_order": 1
                 },
                 {
-                    "data_path": "action_result.parameter.exception",
+                    "data_path": "action_result.parameter.aux_params.exception",
                     "data_type": "boolean",
                     "contains": [],
                     "column_name": "provided_exception",
                     "column_order": 2
                 },
                 {
-                    "data_path": "action_result.parameter.server_group_id",
+                    "data_path": "action_result.parameter.aux_params.server_group_id",
                     "data_type": "numeric",
                     "contains": [],
                     "column_name": "provided_server_group_id",
                     "column_order": 3
                 },
                 {
-                    "data_path": "action_result.parameter.tags",
+                    "data_path": "action_result.parameter.aux_params.tags",
                     "data_type": "string",
                     "contains": [],
                     "column_name": "provided_tags",
                     "column_order": 4
                 },
                 {
-                    "data_path": "action_result.parameter.custom_name",
+                    "data_path": "action_result.parameter.aux_params.custom_name",
                     "data_type": "string",
                     "contains": [],
                     "column_name": "provided_custom_name",
@@ -1466,14 +1466,14 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.parameter.device_id",
+                    "data_path": "action_result.parameter.path_params.device_id",
                     "data_type": "numeric",
                     "contains": [],
                     "column_name": "provided_device_id",
                     "column_order": 0
                 },
                 {
-                    "data_path": "action_result.parameter.org_id",
+                    "data_path": "action_result.parameter.query_params.o",
                     "data_type": "numeric",
                     "contains": [],
                     "column_name": "provided_org_id",
