@@ -72,10 +72,12 @@ class Params:
         """Get a specific auxiliary parameter value by key"""
         return self._aux_params.get(key, None)
 
-    def to_dict(self) -> Dict[str, Dict[str, str]]:
+    def to_dict(self) -> Dict[str, Dict[str, Any]]:
+        """Get all parameters as a dictionary"""
         return {
             "query_params": self.get_query_params(),
-            "path_params": self.get_path_params()
+            "path_params": self.get_path_params(),
+            "aux_params": self.get_aux_params()
         }
 
     def get_params(self) -> Tuple[Dict[str, str], Dict[str, str]]:
