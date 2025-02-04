@@ -5,6 +5,7 @@ AUTOMOX_CONSOLE_API_KEY = "ax_console_api_key"  # pragma: allowlist secret
 # Endpoints
 AUTOMOX_ORGS_LIST_ENDPOINT = "/orgs"
 AUTOMOX_USERS_LIST_ENDPOINT = "/users"
+AUTOMOX_USERS_LIST_SPECIFIC_ENDPOINT = "/users/{user_id}"
 AUTOMOX_USERS_SELF_ENDPOINT = "/users/self"
 AUTOMOX_GROUPS_LIST_ENDPOINT = "/servergroups"
 AUTOMOX_POLICY_LIST_ENDPOINT = "/policies"

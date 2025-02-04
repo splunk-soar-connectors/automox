@@ -24,6 +24,7 @@ from automox_consts import (
     AUTOMOX_POLICY_RUN_ENDPOINT,
     AUTOMOX_REMOVE_USER_FROM_ACCOUNT_ENDPOINT,
     AUTOMOX_USERS_LIST_ENDPOINT,
+    AUTOMOX_USERS_LIST_SPECIFIC_ENDPOINT,
     AUTOMOX_USERS_SELF_ENDPOINT,
 )
 
@@ -684,7 +685,8 @@ class AutomoxConnector(BaseConnector):
     
     def _handle_list_organization_users(self, action: AutomoxAction) -> int:
         """
-        Handles the list_organization_users action.
+        Handles both list_organization_users and get_organization_user actions.
+        If user_id is provided in the params, fetches a single user, otherwise lists all users.
 
         Args:
             action (AutomoxAction): Action configuration object
@@ -697,11 +699,23 @@ class AutomoxConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(action.params.to_dict()))
         endpoint = self._get_endpoint(action)
 
-        ret_val, users = self._fetch_paginated_data(endpoint, action.params, action_result, self._headers)
+        # Check if we're getting a single user
+        user_id = action.params.get_path_param_by_key("user_id")
+        
+        if user_id:
+            ret_val, users = self._make_rest_call(endpoint, action_result, method="get", headers=self._headers)
+            users = [users] if ret_val == phantom.APP_SUCCESS else []
+        else:
+            ret_val, users = self._fetch_paginated_data(
+                endpoint=endpoint,
+                params=action.params,
+                action_result=action_result,
+                headers=self._headers
+            )
 
         if phantom.is_fail(ret_val):
             return action_result.get_status()
-        
+
         for user in users:
             formatted_user = user.copy()
 
@@ -719,7 +733,7 @@ class AutomoxConnector(BaseConnector):
 
             action_result.add_data(formatted_user)
 
-        if action.summary_key:
+        if action.summary_key and not user_id:  # Only add summary for list operation
             summary = action_result.update_summary({})
             summary[action.summary_key] = len(users)
 
@@ -794,9 +808,16 @@ class AutomoxConnector(BaseConnector):
             "list_organization_users": AutomoxConnector.AutomoxAction(
                 base_endpoint=AUTOMOX_USERS_LIST_ENDPOINT,
                 handle_function=self._handle_list_organization_users,
-                fetch_function=self._fetch_paginated_data,
                 params=Params(query_params={"o": param.get("org_id")}),
                 summary_key="total_users",
+            ),
+            "get_organization_user": AutomoxConnector.AutomoxAction(
+                base_endpoint=AUTOMOX_USERS_LIST_SPECIFIC_ENDPOINT,
+                handle_function=self._handle_list_organization_users,
+                params=Params(
+                    query_params={"o": param.get("org_id")}, 
+                    path_params={"user_id": param.get("user_id")}
+                ),
             ),
             "list_devices": AutomoxConnector.AutomoxAction(
                 base_endpoint=AUTOMOX_DEVICE_LIST_ENDPOINT,
