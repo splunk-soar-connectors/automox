@@ -890,6 +890,134 @@
             "versions": "EQ(*)"
         },
         {
+            "action": "get organization user",
+            "identifier": "get_organization_user",
+            "description": "This action is used to retrieve a single user from an Automox organization.",
+            "verbose": "This action is used to retrieve a single user from an Automox organization.",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "org_id": {
+                    "description": "Identifier of organization",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0,
+                    "name": "org_id"
+                },
+                "user_id": {
+                    "description": "Identifier of user",
+                    "data_type": "numeric",
+                    "required": true,
+                    "primary": true,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 1,
+                    "name": "user_id"
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.query_params.o",
+                    "data_type": "numeric",
+                    "contains": [],
+                    "column_name": "provided_org_id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.path_params.user_id",
+                    "data_type": "numeric",
+                    "column_name": "provided_user_id",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "status",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric",
+                    "column_name": "user_id",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.uuid",
+                    "data_type": "string",
+                    "column_name": "user_uuid",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "column_name": "name",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.email",
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ],
+                    "column_name": "email",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.orgs",
+                    "data_type": "string",
+                    "column_name": "org_id",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.data.*.saml_enabled",
+                    "data_type": "string",
+                    "column_name": "saml_enabled",
+                    "column_order": 8
+                },
+                {
+                    "data_path": "action_result.data.*.sso_enabled",
+                    "data_type": "string",
+                    "column_name": "sso_enabled",
+                    "column_order": 9
+                },
+                {
+                    "data_path": "action_result.data.*.rbac_roles",
+                    "data_type": "string",
+                    "column_name": "rbac_roles",
+                    "column_order": 10
+                },
+                {
+                    "data_path": "action_result.data.*.tags",
+                    "data_type": "string",
+                    "column_name": "tags",
+                    "column_order": 11
+                },
+                {
+                    "data_path": "action_result.data.*.account_id",
+                    "data_type": "string",
+                    "column_name": "primary_account_id",
+                    "column_order": 12
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
             "action": "list organization users",
             "identifier": "list_organization_users",
             "description": "This action is used to retrieve users of the Automox organization",
@@ -979,6 +1107,12 @@
                     "data_type": "string",
                     "column_name": "tags",
                     "column_order": 10
+                },
+                {
+                    "data_path": "action_result.data.*.account_id",
+                    "data_type": "string",
+                    "column_name": "primary_account_id",
+                    "column_order": 11
                 },
                 {
                     "data_path": "action_result.message",
