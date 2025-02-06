@@ -1,7 +1,7 @@
 {
     "appid": "299791c0-3565-4d73-b85d-ed6ef95edcb0",
     "name": "Automox",
-    "description": "Automox is the IT automation platform for modern organizations. Utilizing this app allows for the orchestration of IT operations such as device management, triggering remote\r\noutcomes on endpoints, and basic Automox platform administration.",
+    "description": "Automox is the IT automation platform for modern organizations. Utilizing this app allows for the orchestration of IT operations such as device management, triggering remote\r\noutcomes on endpoints, and basic Automox platform administration",
     "type": "endpoint",
     "product_vendor": "Automox",
     "logo": "automox_light_mode.png",
