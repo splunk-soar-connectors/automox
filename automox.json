@@ -10,6 +10,10 @@
     "python_version": "3",
     "product_version_regex": ".*",
     "publisher": "Automox",
+    "contributors": [
+        "Henry Smith",
+        "Cody Dietz"
+    ],
     "license": "Copyright (c) Automox, 2025",
     "app_version": "1.0.0",
     "utctime_updated": "2025-01-16T15:26:24.042220Z",
@@ -53,12 +57,12 @@
             "action": "run policy",
             "identifier": "run_policy",
             "description": "Schedule a policy for immediate remediation",
-            "verbose": "Use this action to run a policy/worklet on a specific device. For example, you can craft an incident response worklet in your console and use this action to call it.",
+            "verbose": "Use this action to run a policy/worklet immediately on a specific device. For example, you can craft an incident response worklet in your console and use this action to call it.",
             "type": "generic",
             "read_only": false,
             "parameters": {
                 "org_id": {
-                    "description": "Automox Organization ID",
+                    "description": "Organization ID",
                     "data_type": "numeric",
                     "required": false,
                     "primary": false,
@@ -71,7 +75,7 @@
                     "param_name": "org_id"
                 },
                 "device_id": {
-                    "description": "Automox Device ID",
+                    "description": "Device ID",
                     "data_type": "numeric",
                     "required": true,
                     "primary": true,
@@ -84,7 +88,7 @@
                     "param_name": "device_id"
                 },
                 "policy_id": {
-                    "description": "Automox Policy ID",
+                    "description": "Policy ID",
                     "data_type": "numeric",
                     "required": true,
                     "primary": true,
@@ -152,7 +156,7 @@
             "read_only": false,
             "parameters": {
                 "org_id": {
-                    "description": "Automox Organization ID",
+                    "description": "Organization ID",
                     "data_type": "numeric",
                     "required": false,
                     "primary": false,
@@ -242,8 +246,8 @@
             "read_only": false,
             "parameters": {
                 "org_id": {
-                    "description": "Automox Organization ID",
-                    "data_type": "string",
+                    "description": "Organization ID",
+                    "data_type": "numeric",
                     "required": false,
                     "primary": false,
                     "contains": [],
@@ -440,7 +444,7 @@
             "read_only": false,
             "parameters": {
                 "device_id": {
-                    "description": "Identifier of device",
+                    "description": "Device ID",
                     "data_type": "numeric",
                     "required": true,
                     "primary": false,
@@ -453,7 +457,7 @@
                     "param_name": "device_id"
                 },
                 "org_id": {
-                    "description": "Identifier of organization",
+                    "description": "Organization ID",
                     "data_type": "numeric",
                     "required": false,
                     "primary": false,
@@ -592,13 +596,13 @@
         {
             "action": "get device",
             "identifier": "get_device",
-            "description": "Retrieve data for a specific device in the AX Console.",
+            "description": "Retrieve data for a specific device in the AX Console",
             "verbose": "Retrieve data for a specific device in the AX Console.",
             "type": "generic",
             "read_only": false,
             "parameters": {
                 "device_id": {
-                    "description": "Automox Device ID",
+                    "description": "Device ID",
                     "data_type": "numeric",
                     "required": true,
                     "primary": false,
@@ -611,7 +615,7 @@
                     "param_name": "device_id"
                 },
                 "org_id": {
-                    "description": "Automox Organization ID",
+                    "description": "Organization ID",
                     "data_type": "numeric",
                     "required": false,
                     "primary": false,
@@ -741,13 +745,13 @@
         {
             "action": "get device by hostname",
             "identifier": "get_device_by_hostname",
-            "description": "d",
-            "verbose": "d",
+            "description": "This action is used to find an Automox device by Hostname",
+            "verbose": "This action is used to find an Automox device by Hostname. It will return multiple matches.",
             "type": "generic",
             "read_only": false,
             "parameters": {
                 "hostname": {
-                    "description": "1",
+                    "description": "Hostname of device",
                     "data_type": "string",
                     "required": true,
                     "primary": false,
@@ -760,7 +764,7 @@
                     "param_name": "hostname"
                 },
                 "org_id": {
-                    "description": "2",
+                    "description": "Organization ID",
                     "data_type": "numeric",
                     "required": false,
                     "primary": false,
@@ -892,13 +896,13 @@
         {
             "action": "get organization user",
             "identifier": "get_organization_user",
-            "description": "This action is used to retrieve a single user from an Automox organization.",
+            "description": "This action is used to retrieve a single user from an Automox organization",
             "verbose": "This action is used to retrieve a single user from an Automox organization.",
             "type": "generic",
             "read_only": false,
             "parameters": {
                 "org_id": {
-                    "description": "Identifier of organization",
+                    "description": "Organization ID",
                     "data_type": "numeric",
                     "required": false,
                     "primary": false,
@@ -909,7 +913,7 @@
                     "name": "org_id"
                 },
                 "user_id": {
-                    "description": "Identifier of user",
+                    "description": "User ID",
                     "data_type": "numeric",
                     "required": true,
                     "primary": true,
@@ -1026,7 +1030,7 @@
             "read_only": false,
             "parameters": {
                 "org_id": {
-                    "description": "Identifier of organization",
+                    "description": "Organization ID",
                     "data_type": "numeric",
                     "required": false,
                     "primary": false,
@@ -1136,7 +1140,7 @@
             "action": "get device by ip address",
             "identifier": "get_device_by_ip_address",
             "description": "This action is used to find an Automox device by IP address",
-            "verbose": "This action is used to find an Automox device by IP address. You can provide a private or public IP address.",
+            "verbose": "This action is used to find an Automox device by IP address. You can provide a private or public IP address. It will return multiple matches.",
             "type": "generic",
             "read_only": false,
             "parameters": {
@@ -1154,7 +1158,7 @@
                     "param_name": "ip_address"
                 },
                 "org_id": {
-                    "description": "Identifier of organization to restrict results",
+                    "description": "Organization ID",
                     "data_type": "numeric",
                     "required": false,
                     "primary": false,
@@ -1292,7 +1296,7 @@
             "read_only": false,
             "parameters": {
                 "org_id": {
-                    "description": "Identifier of organization to restrict results",
+                    "description": "Organization ID",
                     "data_type": "numeric",
                     "required": false,
                     "primary": false,
@@ -1376,7 +1380,7 @@
             "read_only": false,
             "parameters": {
                 "device_id": {
-                    "description": "Identifier of device",
+                    "description": "Device ID",
                     "data_type": "numeric",
                     "required": true,
                     "primary": false,
@@ -1387,7 +1391,7 @@
                     "name": "device_id"
                 },
                 "org_id": {
-                    "description": "Identifier of organization",
+                    "description": "Organization ID",
                     "data_type": "numeric",
                     "required": false,
                     "primary": false,
@@ -1500,7 +1504,7 @@
             "read_only": false,
             "parameters": {
                 "account_id": {
-                    "description": "Account UUID to retrieve users for.",
+                    "description": "Account UUID to retrieve users for",
                     "data_type": "string",
                     "required": true,
                     "primary": false,
@@ -1511,7 +1515,7 @@
                     "name": "account_id"
                 },
                 "user_id": {
-                    "description": "UUID of user to delete.",
+                    "description": "UUID of user to delete",
                     "data_type": "string",
                     "required": true,
                     "primary": false,
@@ -1564,13 +1568,13 @@
         {
             "action": "update device",
             "identifier": "update_device",
-            "description": "Use this action to update a device in the console.",
+            "description": "Use this action to update a device in the console",
             "verbose": "Use this action to update a device in the console.",
             "type": "contain",
             "read_only": false,
             "parameters": {
                 "device_id": {
-                    "description": "Identifier of device",
+                    "description": "Device ID",
                     "data_type": "numeric",
                     "required": true,
                     "primary": false,
@@ -1583,7 +1587,7 @@
                     "param_name": "device_id"
                 },
                 "org_id": {
-                    "description": "Identifier of organization",
+                    "description": "Organization ID",
                     "data_type": "numeric",
                     "required": false,
                     "primary": false,
@@ -1608,7 +1612,7 @@
                     "param_name": "exception"
                 },
                 "server_group_id": {
-                    "description": "Identifier of server group",
+                    "description": "Server group ID to assign device to",
                     "data_type": "numeric",
                     "required": true,
                     "primary": false,
@@ -1717,13 +1721,13 @@
         {
             "action": "delete device",
             "identifier": "delete_device",
-            "description": "Use this action to delete a device from the console.",
+            "description": "Use this action to delete a device from the console",
             "verbose": "Use this action to delete a device from the console.",
             "type": "contain",
             "read_only": false,
             "parameters": {
                 "device_id": {
-                    "description": "Identifier of device",
+                    "description": "Device ID",
                     "data_type": "numeric",
                     "required": true,
                     "primary": false,
@@ -1734,7 +1738,7 @@
                     "name": "device_id"
                 },
                 "org_id": {
-                    "description": "Identifier of organization",
+                    "description": "Organization ID",
                     "data_type": "numeric",
                     "required": false,
                     "primary": false,
