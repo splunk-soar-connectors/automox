@@ -388,31 +388,6 @@ class AutomoxConnector(BaseConnector):
         return response[0].get("total_count", 0)
 
     @staticmethod
-    def _find_matching_device(devices: List[Device], attributes: List[str], value: str) -> Optional[Device]:
-        """
-        Searches for a device matching specified attributes and value.
-
-        Args:
-            devices (List[Device]): List of device dictionaries to search
-            attributes (List[str]): Device attributes to check
-            value (str): Value to match against
-
-        Returns:
-            Optional[Device]: Matching device dictionary or None if not found
-        """
-        for device in devices:
-            for attr in attributes:
-                attr_value = device.get(attr)
-
-                if attr_value is None:
-                    continue
-                if isinstance(attr_value, str) and attr_value.casefold() == value.casefold():
-                    return device
-                if isinstance(attr_value, list) and value.lower() in (v.lower() for v in attr_value):
-                    return device
-        return None
-
-    @staticmethod
     def _is_valid_number(value: Any) -> bool:
         """
         Check if value is valid (not None and either a number or any other non-None type)
@@ -443,16 +418,44 @@ class AutomoxConnector(BaseConnector):
             ]
         return item
 
-    def find_device_by_attribute_with_value(
+    @staticmethod
+    def _find_matching_devices(devices: List[Device], attributes: List[str], value: str) -> List[Device]:
+        """
+        Searches for all devices matching specified attributes and value.
+
+        Args:
+            devices (List[Device]): List of device dictionaries to search
+            attributes (List[str]): Device attributes to check
+            value (str): Value to match against
+
+        Returns:
+            List[Device]: List of matching device dictionaries
+        """
+        matches = []
+        for device in devices:
+            for attr in attributes:
+                attr_value = device.get(attr)
+
+                if attr_value is None:
+                    continue
+                if isinstance(attr_value, str) and attr_value.casefold() == value.casefold():
+                    matches.append(device)
+                    break
+                if isinstance(attr_value, list) and value.lower() in (v.lower() for v in attr_value):
+                    matches.append(device)
+                    break
+        return matches
+
+    def find_devices_by_attribute_with_value(
         self, 
         endpoint: str, 
         attributes: List[str], 
         value: str, 
         action_result: ActionResult,
         params: Optional[Union[Params, Dict[str, Any]]] = None
-    ) -> Optional[Device]:
+    ) -> Optional[List[Device]]:
         """
-        Searches through all devices to find one matching specified attributes with given value.
+        Searches through all devices to find all matching specified attributes with given value.
 
         Args:
             endpoint (str): API endpoint for device listing
@@ -462,11 +465,12 @@ class AutomoxConnector(BaseConnector):
             params (Optional[Union[Params, Dict[str, Any]]]): Parameters for the request
 
         Returns:
-            Optional[Device]: Matching device dictionary or None if not found
+            Optional[List[Device]]: List of matching device dictionaries or None if no matches found
 
         Raises:
             Exception: If API call fails
         """
+        matches = []
         total_devices = self._get_total_device_count(endpoint, action_result)
         if total_devices is None:
             return None
@@ -488,9 +492,8 @@ class AutomoxConnector(BaseConnector):
                 self.debug_print(f"Failed to get devices: {action_result.get_message()}")
                 raise Exception(f"Failed to get devices: {action_result.get_message()}")
 
-            device = self._find_matching_device(devices, attributes, value)
-            if device:
-                return self.remove_null_values(device)  # type: ignore
+            page_matches = self._find_matching_devices(devices, attributes, value)
+            matches.extend(self.remove_null_values(device) for device in page_matches)
 
             if len(devices) < self._page_limit:
                 break
@@ -498,8 +501,8 @@ class AutomoxConnector(BaseConnector):
             paginated_params = self.next_page(paginated_params)
             current_page += 1
 
-        self.debug_print(f"Device relating to {value} not found")
-        return None
+        self.debug_print(f"Found {len(matches)} devices matching {value}")
+        return matches if matches else None
 
     # Action logic
     def _handle_generic(self, action: AutomoxAction) -> int:
@@ -540,6 +543,7 @@ class AutomoxConnector(BaseConnector):
     def _handle_get_device_by_ip_address(self, action: AutomoxAction) -> int:
         """
         Handles the get_device_by_ip_address action.
+        Returns all devices that match the given IP address.
 
         Args:
             action (AutomoxAction): Action configuration object
@@ -553,14 +557,14 @@ class AutomoxConnector(BaseConnector):
         endpoint = self._get_endpoint(action)
 
         ip_address = action.params.get_aux_param_by_key("ip_address")
-        ip_pattern = re.compile(r"^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$") # Validate IP address format using regex
+        ip_pattern = re.compile(r"^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$")
 
         if not ip_pattern.match(ip_address):
             return action_result.set_status(phantom.APP_ERROR, f"Invalid IP address format: {ip_address}")
 
         try:
-            # Pass the params to find_device_by_attribute_with_value
-            device = self.find_device_by_attribute_with_value(
+            # Search for devices with matching public IP
+            matches = self.find_devices_by_attribute_with_value(
                 endpoint=endpoint, 
                 attributes=["ip_addrs"], 
                 value=ip_address, 
@@ -568,10 +572,10 @@ class AutomoxConnector(BaseConnector):
                 params=action.params
             )
 
-            # if we didn't find a match using the Public IP, try private IPs
-            if not device:
-                self.save_progress("Device not found using public IP. Trying private IPs...")
-                device = self.find_device_by_attribute_with_value(
+            # If no matches found with public IP, try private IPs
+            if not matches:
+                self.save_progress("No devices found using public IP. Trying private IPs...")
+                matches = self.find_devices_by_attribute_with_value(
                     endpoint=endpoint, 
                     attributes=["ip_addrs_private"], 
                     value=ip_address, 
@@ -579,21 +583,27 @@ class AutomoxConnector(BaseConnector):
                     params=action.params
                 )
 
-            # if we don't find any matches at all
-            if not device:
-                return action_result.set_status(phantom.APP_ERROR, f"Device with IP address {ip_address} not found")
+            if not matches:
+                return action_result.set_status(phantom.APP_ERROR, f"No devices found with IP address {ip_address}")
 
-            action_result.add_data(device if device else {})
+            # Add all matching devices to the result
+            for device in matches:
+                action_result.add_data(device)
+
+            if action.summary_key:
+                summary = action_result.update_summary({})
+                summary[action.summary_key] = len(matches)
 
             return action_result.set_status(phantom.APP_SUCCESS)
 
         except Exception as e:
             self.debug_print(f"Exception occurred: {str(e)}")
-            return action_result.set_status(phantom.APP_ERROR, f"Error finding device by IP address: {str(e)}")
+            return action_result.set_status(phantom.APP_ERROR, f"Error finding devices by IP address: {str(e)}")
 
     def _handle_get_device_by_hostname(self, action: AutomoxAction) -> int:
         """
         Handles the get_device_by_hostname action.
+        Returns all devices that match the given hostname.
 
         Args:
             action (AutomoxAction): Action configuration object
@@ -607,10 +617,10 @@ class AutomoxConnector(BaseConnector):
         endpoint = self._get_endpoint(action)
 
         hostname = action.params.get_aux_param_by_key("hostname")
-        self.debug_print(f"Searching for device with hostname: {hostname}")
+        self.debug_print(f"Searching for devices with hostname: {hostname}")
 
         try:
-            device = self.find_device_by_attribute_with_value(
+            matches = self.find_devices_by_attribute_with_value(
                 endpoint=endpoint, 
                 attributes=["name"], 
                 value=hostname, 
@@ -618,16 +628,22 @@ class AutomoxConnector(BaseConnector):
                 params=action.params
             )
 
-            if not device:
-                return action_result.set_status(phantom.APP_ERROR, f"Device with hostname {hostname} not found")
+            if not matches:
+                return action_result.set_status(phantom.APP_ERROR, f"No devices found with hostname {hostname}")
 
-            action_result.add_data(device)
+            # Add all matching devices to the result
+            for device in matches:
+                action_result.add_data(device)
+
+            if action.summary_key:
+                summary = action_result.update_summary({})
+                summary[action.summary_key] = len(matches)
 
             return action_result.set_status(phantom.APP_SUCCESS)
 
         except Exception as e:
             self.debug_print(f"Exception occurred: {str(e)}")
-            return action_result.set_status(phantom.APP_ERROR, f"Error finding device by hostname: {str(e)}")
+            return action_result.set_status(phantom.APP_ERROR, f"Error finding devices by hostname: {str(e)}")
 
     def _handle_update_device(self, action: AutomoxAction):
         """
@@ -837,13 +853,14 @@ class AutomoxConnector(BaseConnector):
                 base_endpoint=AUTOMOX_DEVICE_LIST_ENDPOINT,
                 handle_function=self._handle_get_device_by_hostname,
                 params=Params(query_params={"o": param.get("org_id")}, hostname=param.get("hostname")),
-                summary_key="",
+                summary_key="total_devices",
             ),
             "get_device_by_ip_address": (
                 AutomoxConnector.AutomoxAction(
                     base_endpoint=AUTOMOX_DEVICE_LIST_ENDPOINT,
                     handle_function=self._handle_get_device_by_ip_address,
                     params=Params(query_params={"o": param.get("org_id")}, ip_address=param.get("ip_address")),
+                    summary_key="total_devices",
                 )
             ),
             "get_device_software": AutomoxConnector.AutomoxAction(
