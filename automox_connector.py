@@ -882,7 +882,7 @@ class AutomoxConnector(BaseConnector):
                 handle_function=self._handle_generic,
                 fetch_function=self._make_rest_call,
                 fetch_function_method="delete",
-                params=Params(path_params={"account_id": param.get("account_id"), "user_id": param.get("user_id")}),
+                params=Params(path_params={"account_uuid": param.get("account_uuid"), "user_uuid": param.get("user_uuid")}),
             ),
             "update_device": AutomoxConnector.AutomoxAction(
                 base_endpoint=AUTOMOX_DEVICE_SPECIFIC_ENDPOINT,

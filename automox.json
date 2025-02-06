@@ -1503,7 +1503,7 @@
             "type": "contain",
             "read_only": false,
             "parameters": {
-                "account_id": {
+                "account_uuid": {
                     "description": "Account UUID to retrieve users for",
                     "data_type": "string",
                     "required": true,
@@ -1512,9 +1512,9 @@
                     "value_list": [],
                     "default": "",
                     "order": 0,
-                    "name": "account_id"
+                    "name": "account_uuid"
                 },
-                "user_id": {
+                "user_uuid": {
                     "description": "UUID of user to delete",
                     "data_type": "string",
                     "required": true,
@@ -1523,22 +1523,22 @@
                     "value_list": [],
                     "default": "",
                     "order": 1,
-                    "name": "user_id"
+                    "name": "user_uuid"
                 }
             },
             "output": [
                 {
-                    "data_path": "action_result.parameter.path_params.account_id",
+                    "data_path": "action_result.parameter.path_params.account_uuid",
                     "data_type": "string",
                     "contains": [],
-                    "column_name": "provided_account_id",
+                    "column_name": "provided_account_uuid",
                     "column_order": 0
                 },
                 {
-                    "data_path": "action_result.parameter.path_params.user_id",
+                    "data_path": "action_result.parameter.path_params.user_uuid",
                     "data_type": "string",
                     "contains": [],
-                    "column_name": "provided_user_id",
+                    "column_name": "provided_user_uuid",
                     "column_order": 1
                 },
                 {
