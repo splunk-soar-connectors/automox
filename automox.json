@@ -203,8 +203,8 @@
                 },
                 {
                     "data_path": "action_result.data.*.*.organization_id",
-                    "data_type": "string",
-                    "column_name": "organization_id",
+                    "data_type": "numeric",
+                    "column_name": "org_id",
                     "column_order": 5
                 },
                 {
@@ -344,8 +344,8 @@
                 },
                 {
                     "data_path": "action_result.data.*.*.organization_id",
-                    "data_type": "string",
-                    "column_name": "organization_id",
+                    "data_type": "numeric",
+                    "column_name": "org_id",
                     "column_order": 12
                 },
                 {
@@ -524,7 +524,7 @@
                 {
                     "data_path": "action_result.data.*.*.organization_id",
                     "data_type": "string",
-                    "column_name": "organization_id",
+                    "column_name": "org_id",
                     "column_order": 8
                 },
                 {
@@ -1338,7 +1338,7 @@
                 {
                     "data_path": "action_result.data.*.*.organization_id",
                     "data_type": "string",
-                    "column_name": "organization_id",
+                    "column_name": "org_id",
                     "column_order": 4
                 },
                 {
@@ -1444,7 +1444,7 @@
                 {
                     "data_path": "action_result.data.*.*.organization_id",
                     "data_type": "numeric",
-                    "column_name": "organization_id",
+                    "column_name": "org_id",
                     "column_order": 6
                 },
                 {
