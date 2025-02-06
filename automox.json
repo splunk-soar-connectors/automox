@@ -11,8 +11,12 @@
     "product_version_regex": ".*",
     "publisher": "Automox",
     "contributors": [
-        "Henry Smith",
-        "Cody Dietz"
+        {
+            "name": "Henry Smith"
+        },
+        {
+            "name": "Cody Dietz"
+        }
     ],
     "license": "Copyright (c) Automox, 2025",
     "app_version": "1.0.0",
