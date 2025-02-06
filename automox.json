@@ -1004,7 +1004,7 @@
                 {
                     "data_path": "action_result.data.*.account_id",
                     "data_type": "string",
-                    "column_name": "primary_account_id",
+                    "column_name": "primary_account_uuid",
                     "column_order": 12
                 },
                 {
@@ -1115,7 +1115,7 @@
                 {
                     "data_path": "action_result.data.*.account_id",
                     "data_type": "string",
-                    "column_name": "primary_account_id",
+                    "column_name": "primary_account_uuid",
                     "column_order": 11
                 },
                 {
