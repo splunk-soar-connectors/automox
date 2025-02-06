@@ -50,7 +50,7 @@
             "action": "test connectivity",
             "identifier": "test_connectivity",
             "description": "Validate the asset configuration for connectivity using supplied configuration",
-            "verbose": "",
+            "verbose": "Validate the asset configuration for connectivity using supplied configuration. This action calls the /users/self endpoint to validate the API key and the connection to the Automox API.",
             "type": "test",
             "read_only": true,
             "parameters": {},
@@ -1690,7 +1690,7 @@
             "action": "list groups",
             "identifier": "list_groups",
             "description": "This action is used to list Automox groups",
-            "verbose": "This action is used to list Automox groups",
+            "verbose": "This action is used to list Automox groups.",
             "type": "generic",
             "read_only": false,
             "parameters": {
@@ -1796,7 +1796,7 @@
             "action": "get command queues",
             "identifier": "get_command_queues",
             "description": "Use this action to return a list of queued up commands for a device",
-            "verbose": "Use this action to return a list of queued up commands for a device",
+            "verbose": "Use this action to return a list of queued up commands for a device.",
             "type": "generic",
             "read_only": false,
             "parameters": {
