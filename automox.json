@@ -318,7 +318,7 @@
                     "contains": [
                         "ip"
                     ],
-                    "column_name": "ip_addrs",
+                    "column_name": "public_IPs",
                     "column_order": 8
                 },
                 {
@@ -327,7 +327,7 @@
                     "contains": [
                         "ip"
                     ],
-                    "column_name": "ip_addrs_private",
+                    "column_name": "private_IPs",
                     "column_order": 9
                 },
                 {
