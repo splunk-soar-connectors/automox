@@ -1,6 +1,6 @@
-import argparse
 import json
 import re
+from datetime import time, timedelta
 from math import ceil
 from typing import Any, Dict, List, Optional, Tuple, TypedDict, Union
 from urllib.parse import quote, urlencode
@@ -44,9 +44,9 @@ class Params:
         if query_params is None:
             query_params = {}
 
-        self._query_params = query_params # {"description": "Query parameters for the API request"}
-        self._path_params = path_params # {"description": "Path parameters for the API request"}
-        self._aux_params = dict(kwargs) # {"description": "Additional parameters for the API request"}
+        self._query_params = query_params  # {"description": "Query parameters for the API request"}
+        self._path_params = path_params  # {"description": "Path parameters for the API request"}
+        self._aux_params = dict(kwargs)  # {"description": "Additional parameters for the API request"}
 
     def get_query_params(self) -> Dict[str, str]:
         """Get a copy of query parameters"""
@@ -74,11 +74,7 @@ class Params:
 
     def to_dict(self) -> Dict[str, Dict[str, Any]]:
         """Get all parameters as a dictionary"""
-        return {
-            "query_params": self.get_query_params(),
-            "path_params": self.get_path_params(),
-            "aux_params": self.get_aux_params()
-        }
+        return {"query_params": self.get_query_params(), "path_params": self.get_path_params(), "aux_params": self.get_aux_params()}
 
     def get_params(self) -> Tuple[Dict[str, str], Dict[str, str]]:
         """Get parameters for URL building"""
@@ -110,7 +106,9 @@ class AutomoxConnector(BaseConnector):
         summary_key: str  # {"description": "Key used in action summary response"}
         handle_function: callable  # {"description": "Function that handles the action logic"}
         fetch_function: callable  # {"description": "Function that fetches data from the API"}
-        fetch_function_method: str  # {"description": "HTTP method to use for the API request", "allowed_values": ["get", "post", "put", "delete"]}
+        fetch_function_method: (
+            str  # {"description": "HTTP method to use for the API request", "allowed_values": ["get", "post", "put", "delete"]}
+        )
 
         def __init__(
             self,
@@ -122,9 +120,7 @@ class AutomoxConnector(BaseConnector):
             summary_key: str = None,
         ):
             # Convert dict to Params at creation time
-            self.params = Params() if params is None else (
-                params if isinstance(params, Params) else Params(**params)
-            )
+            self.params = Params() if params is None else (params if isinstance(params, Params) else Params(**params))
             self.base_endpoint = base_endpoint
             self.params = params
             self.summary_key = summary_key
@@ -153,10 +149,7 @@ class AutomoxConnector(BaseConnector):
         return phantom.APP_SUCCESS
 
     def _get_endpoint(self, action: AutomoxAction) -> str:
-        return self._build_url_for_action(
-            base_endpoint=action.base_endpoint,
-            action=action
-        )
+        return self._build_url_for_action(base_endpoint=action.base_endpoint, action=action)
 
     def _build_url_for_action(self, base_endpoint: str, action: AutomoxAction) -> str:
         """
@@ -245,7 +238,9 @@ class AutomoxConnector(BaseConnector):
         if not r.text:
             return self._process_empty_response(r, action_result)
 
-        message = f"Can't process response from server. Status Code: {r.status_code} Data from server: {r.text.replace('{', '{{').replace('}', '}}')}"
+        message = (
+            f"Can't process response from server. Status Code: {r.status_code} Data from server: {r.text.replace('{', '{{').replace('}', '}}')}"
+        )
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -271,11 +266,7 @@ class AutomoxConnector(BaseConnector):
         return self._process_response(r, action_result)
 
     def _fetch_paginated_data(
-        self, 
-        endpoint: str, 
-        params: Union[Params, Dict[str, Any]], 
-        action_result: ActionResult, 
-        headers: Dict[str, str]
+        self, endpoint: str, params: Union[Params, Dict[str, Any]], action_result: ActionResult, headers: Dict[str, str]
     ) -> Tuple[int, List[Dict[str, Any]]]:
         """Fetches all pages of data from a paginated API endpoint."""
         params_obj = params if isinstance(params, Params) else Params(**params)
@@ -284,10 +275,7 @@ class AutomoxConnector(BaseConnector):
 
         while True:
             ret_val, response = self._make_rest_call(
-                endpoint=endpoint,
-                action_result=action_result,
-                params=paginated_params.get_query_params(),
-                headers=headers
+                endpoint=endpoint, action_result=action_result, params=paginated_params.get_query_params(), headers=headers
             )
 
             if phantom.is_fail(ret_val):
@@ -307,13 +295,10 @@ class AutomoxConnector(BaseConnector):
         """Initialize pagination parameters"""
         if not isinstance(params, Params):
             params = Params(**params)
-        
+
         query_params = params.get_query_params()
-        query_params.update({
-            "limit": self._page_limit,
-            "page": 0
-        })
-        
+        query_params.update({"limit": self._page_limit, "page": 0})
+
         return Params(query_params=query_params, path_params=params.get_path_params())
 
     @staticmethod
@@ -323,17 +308,17 @@ class AutomoxConnector(BaseConnector):
         current_page = query_params.get("page", 0)
         query_params["page"] = current_page + 1
         query_params["limit"] = query_params.get("limit", 100)
-        
+
         return Params(query_params=query_params, path_params=params.get_path_params())
 
     def _format_for_display(self, value: Any) -> str:
         """
         Format any value into a human-readable string representation.
         This is because the table display in SOAR sanitizes the data and does not display nested json nicely.
-        
+
         Args:
             value: Any value to format
-            
+
         Returns:
             str: Human-readable string representation
         """
@@ -350,7 +335,7 @@ class AutomoxConnector(BaseConnector):
                 return ", ".join(str(next(iter(x.values()))) if x else str(x) for x in value)
             # Simple list - join with commas
             return ", ".join(str(x) for x in value)
-        
+
         if isinstance(value, dict):
             # Extract the most meaningful parts of a dict
             meaningful_keys = ["name", "id", "value", "type"]
@@ -362,7 +347,7 @@ class AutomoxConnector(BaseConnector):
                 return " - ".join(values)
             # Fallback to first value if no meaningful keys found
             return str(next(iter(value.values()))) if value else ""
-            
+
         # Handle basic types
         return str(value)
 
@@ -390,10 +375,10 @@ class AutomoxConnector(BaseConnector):
     def _is_valid_number(value: Any) -> bool:
         """
         Check if value is valid (not None and either a number or any other non-None type)
-        
+
         Args:
             value: Value to check
-            
+
         Returns:
             bool: True if value is valid, False otherwise
         """
@@ -446,12 +431,12 @@ class AutomoxConnector(BaseConnector):
         return matches
 
     def find_devices_by_attribute_with_value(
-        self, 
-        endpoint: str, 
-        attributes: List[str], 
-        value: str, 
+        self,
+        endpoint: str,
+        attributes: List[str],
+        value: str,
         action_result: ActionResult,
-        params: Optional[Union[Params, Dict[str, Any]]] = None
+        params: Optional[Union[Params, Dict[str, Any]]] = None,
     ) -> Optional[List[Device]]:
         """
         Searches through all devices to find all matching specified attributes with given value.
@@ -476,15 +461,12 @@ class AutomoxConnector(BaseConnector):
 
         max_pages = ceil(total_devices / self._page_limit)
         paginated_params = self.first_page(params)
-        
+
         for current_page in range(max_pages):
             self.debug_print(f"Fetching devices with params: {paginated_params.to_dict()}")
 
             ret_val, devices = self._make_rest_call(
-                endpoint=endpoint,
-                action_result=action_result,
-                params=paginated_params.get_query_params(),
-                headers=self._headers
+                endpoint=endpoint, action_result=action_result, params=paginated_params.get_query_params(), headers=self._headers
             )
 
             if phantom.is_fail(ret_val):
@@ -564,22 +546,14 @@ class AutomoxConnector(BaseConnector):
         try:
             # Search for devices with matching public IP
             matches = self.find_devices_by_attribute_with_value(
-                endpoint=endpoint, 
-                attributes=["ip_addrs"], 
-                value=ip_address, 
-                action_result=action_result,
-                params=action.params
+                endpoint=endpoint, attributes=["ip_addrs"], value=ip_address, action_result=action_result, params=action.params
             )
 
             # If no matches found with public IP, try private IPs
             if not matches:
                 self.save_progress("No devices found using public IP. Trying private IPs...")
                 matches = self.find_devices_by_attribute_with_value(
-                    endpoint=endpoint, 
-                    attributes=["ip_addrs_private"], 
-                    value=ip_address, 
-                    action_result=action_result,
-                    params=action.params
+                    endpoint=endpoint, attributes=["ip_addrs_private"], value=ip_address, action_result=action_result, params=action.params
                 )
 
             if not matches:
@@ -620,11 +594,7 @@ class AutomoxConnector(BaseConnector):
 
         try:
             matches = self.find_devices_by_attribute_with_value(
-                endpoint=endpoint, 
-                attributes=["name"], 
-                value=hostname, 
-                action_result=action_result,
-                params=action.params
+                endpoint=endpoint, attributes=["name"], value=hostname, action_result=action_result, params=action.params
             )
 
             if not matches:
@@ -697,7 +667,7 @@ class AutomoxConnector(BaseConnector):
         action_result.add_data(response)
 
         return action_result.set_status(phantom.APP_SUCCESS)
-    
+
     def _handle_list_organization_users(self, action: AutomoxAction) -> int:
         """
         Handles both list_organization_users and get_organization_user actions.
@@ -716,16 +686,13 @@ class AutomoxConnector(BaseConnector):
 
         # Check if we're getting a single user
         user_id = action.params.get_path_param_by_key("user_id")
-        
+
         if user_id:
             ret_val, users = self._make_rest_call(endpoint, action_result, method="get", headers=self._headers)
             users = [users] if ret_val == phantom.APP_SUCCESS else []
         else:
             ret_val, users = self._fetch_paginated_data(
-                endpoint=endpoint,
-                params=action.params,
-                action_result=action_result,
-                headers=self._headers
+                endpoint=endpoint, params=action.params, action_result=action_result, headers=self._headers
             )
 
         if phantom.is_fail(ret_val):
@@ -741,7 +708,7 @@ class AutomoxConnector(BaseConnector):
             # Format the orgs and rbac_roles as JSON strings
             formatted_user.update(self._format_list_fields(user, "orgs"))
             formatted_user.update(self._format_list_fields(user, "rbac_roles"))
-            
+
             # Format tags if present
             if "tags" in user:
                 formatted_user.update(self._format_list_fields(user, "tags"))
@@ -770,7 +737,7 @@ class AutomoxConnector(BaseConnector):
 
         if action_id == phantom.ACTION_ID_INGEST_ON_POLL:
             start_time = time.time()
-            result = self._on_poll(action)
+            result = self._on_poll(param)
             end_time = time.time()
             diff_time = end_time - start_time
             human_time = str(timedelta(seconds=int(diff_time)))
@@ -829,10 +796,7 @@ class AutomoxConnector(BaseConnector):
             "get_organization_user": AutomoxConnector.AutomoxAction(
                 base_endpoint=AUTOMOX_USERS_LIST_SPECIFIC_ENDPOINT,
                 handle_function=self._handle_list_organization_users,
-                params=Params(
-                    query_params={"o": param.get("org_id")}, 
-                    path_params={"user_id": param.get("user_id")}
-                ),
+                params=Params(query_params={"o": param.get("org_id")}, path_params={"user_id": param.get("user_id")}),
             ),
             "list_devices": AutomoxConnector.AutomoxAction(
                 base_endpoint=AUTOMOX_DEVICE_LIST_ENDPOINT,
@@ -920,44 +884,36 @@ class AutomoxConnector(BaseConnector):
         return phantom.APP_SUCCESS
 
 
-def parse_args():
+if __name__ == "__main__":
+    import argparse
+
+    import pudb
+
+    pudb.set_trace()
+
     argparser = argparse.ArgumentParser()
 
     argparser.add_argument("input_test_json", help="Input Test JSON file")
     argparser.add_argument("-u", "--username", help="username", required=False)
     argparser.add_argument("-p", "--password", help="password", required=False)
+    argparser.add_argument(
+        "-v",
+        "--verify",
+        action="store_true",
+        help="verify",
+        required=False,
+        default=False,
+    )
 
-    return argparser.parse_args()
-
-def login(args: argparse.Namespace):
-    login_url = f"{AutomoxConnector._get_phantom_base_url()}/login"
-
-    print("Accessing the Login page")
-    r = requests.get(login_url, verify=False)
-    csrftoken = r.cookies["csrftoken"]
-
-    data = dict()
-    data["username"] = args.username
-    data["password"] = args.password
-    data["csrfmiddlewaretoken"] = csrftoken
-
-    headers = dict()
-    headers["Cookie"] = "csrftoken=" + csrftoken
-    headers["Referer"] = login_url
-
-    print("Logging into Platform to get the session id")
-    r2 = requests.post(login_url, verify=False, data=data, headers=headers)
-
-    return r2.cookies["sessionid"]
-
-def main():
-    args = parse_args()
-
+    args = argparser.parse_args()
     session_id = None
+
     username = args.username
     password = args.password
+    verify = args.verify
 
     if username and not password:
+
         # User specified a username but not a password, so ask
         import getpass
 
@@ -965,7 +921,29 @@ def main():
 
     if username and password:
         try:
-            session_id = login(args=args)
+            print("Accessing the Login page")
+            r = requests.get(  # nosemgrep: python.requests.best-practice.use-timeout.use-timeout
+                BaseConnector._get_phantom_base_url() + "login", verify=verify
+            )
+            csrftoken = r.cookies["csrftoken"]
+
+            data = dict()
+            data["username"] = username
+            data["password"] = password
+            data["csrfmiddlewaretoken"] = csrftoken
+
+            headers = dict()
+            headers["Cookie"] = "csrftoken=" + csrftoken
+            headers["Referer"] = BaseConnector._get_phantom_base_url() + "login"
+
+            print("Logging into Platform to get the session id")
+            r2 = requests.post(  # nosemgrep: python.requests.best-practice.use-timeout.use-timeout
+                BaseConnector._get_phantom_base_url() + "login",
+                verify=verify,
+                data=data,
+                headers=headers,
+            )
+            session_id = r2.cookies["sessionid"]
         except Exception as e:
             print(f"Unable to get session id from the platform. Error: {str(e)}")
             exit(1)
@@ -986,7 +964,3 @@ def main():
         print(json.dumps(json.loads(ret_val), indent=4))
 
     exit(0)
-
-
-if __name__ == "__main__":
-    main()
