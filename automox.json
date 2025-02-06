@@ -185,7 +185,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.*.id",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "column_name": "policy_id",
                     "column_order": 2
                 },
@@ -275,7 +275,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.*.id",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "column_name": "device_id",
                     "column_order": 2
                 },
@@ -338,7 +338,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.*.server_group_id",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "column_name": "server_group_id",
                     "column_order": 11
                 },
@@ -511,7 +511,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.*.id",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "column_name": "package_id",
                     "column_order": 6
                 },
@@ -523,7 +523,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.*.organization_id",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "column_name": "org_id",
                     "column_order": 8
                 },
@@ -541,13 +541,13 @@
                 },
                 {
                     "data_path": "action_result.data.*.*.package_id",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "column_name": "package_id",
                     "column_order": 11
                 },
                 {
                     "data_path": "action_result.data.*.*.package_version_id",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "column_name": "package_version_id",
                     "column_order": 12
                 },
@@ -559,13 +559,13 @@
                 },
                 {
                     "data_path": "action_result.data.*.*.server_id",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "column_name": "device_id",
                     "column_order": 14
                 },
                 {
                     "data_path": "action_result.data.*.*.software_id",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "column_name": "software_id",
                     "column_order": 15
                 },
@@ -685,7 +685,7 @@
                 {
                     "data_path": "action_result.data.*.connected",
                     "data_type": "string",
-                    "column_name": "connected?",
+                    "column_name": "connected",
                     "column_order": 8
                 },
                 {
@@ -836,7 +836,7 @@
                 {
                     "data_path": "action_result.data.*.connected",
                     "data_type": "string",
-                    "column_name": "connected?",
+                    "column_name": "connected",
                     "column_order": 8
                 },
                 {
@@ -1230,7 +1230,7 @@
                 {
                     "data_path": "action_result.data.*.connected",
                     "data_type": "string",
-                    "column_name": "connected?",
+                    "column_name": "connected",
                     "column_order": 8
                 },
                 {
@@ -1337,20 +1337,20 @@
                 },
                 {
                     "data_path": "action_result.data.*.*.organization_id",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "column_name": "org_id",
                     "column_order": 4
                 },
                 {
                     "data_path": "action_result.data.*.*.parent_server_group_id",
-                    "data_type": "string",
-                    "column_name": "parent_server_group_id",
+                    "data_type": "numeric",
+                    "column_name": "parent_device_group_id",
                     "column_order": 5
                 },
                 {
                     "data_path": "action_result.data.*.*.server_count",
-                    "data_type": "string",
-                    "column_name": "server_count",
+                    "data_type": "numeric",
+                    "column_name": "device_count",
                     "column_order": 6
                 },
                 {
