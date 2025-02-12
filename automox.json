@@ -4,8 +4,8 @@
     "description": "Automox is the IT automation platform for modern organizations. Utilizing this app allows for the orchestration of IT operations such as device management, triggering remote\r\noutcomes on endpoints, and basic Automox platform administration",
     "type": "endpoint",
     "product_vendor": "Automox",
-    "logo": "automox_light_mode.png",
-    "logo_dark": "automox_dark_mode.png",
+    "logo": "automox_light_mode.svg",
+    "logo_dark": "automox_dark_mode.svg",
     "product_name": "Automox",
     "python_version": "3",
     "product_version_regex": ".*",
@@ -117,7 +117,7 @@
                     "column_order": 0
                 },
                 {
-                    "data_path": "action_result.parameter.aux_params.body.serverId",
+                    "data_path": "action_result.parameter.aux_params.device_id",
                     "data_type": "numeric",
                     "example_values": [
                         "123456"
@@ -261,6 +261,145 @@
                     ],
                     "column_name": "status",
                     "column_order": 7
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get policy",
+            "identifier": "get_policy",
+            "description": "Get the specified policy in your organization",
+            "verbose": "Get the specified policy in your organization.",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "org_id": {
+                    "description": "Organization ID",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0,
+                    "name": "org_id",
+                    "id": 1,
+                    "param_name": "org_id"
+                },
+                "policy_id": {
+                    "description": "Policy ID",
+                    "data_type": "numeric",
+                    "required": true,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 1,
+                    "name": "policy_id",
+                    "id": 2,
+                    "param_name": "org_id"
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.query_params.o",
+                    "data_type": "numeric",
+                    "example_values": [
+                        "123456"
+                    ],
+                    "contains": [],
+                    "column_name": "provided_org_id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.path_params.policy_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        "123456"
+                    ],
+                    "contains": [],
+                    "column_name": "provided_policy_id",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_name": "status",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        "123456"
+                    ],
+                    "column_name": "policy_id",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.uuid",
+                    "data_type": "string",
+                    "example_values": [
+                        "8cbea739-abaf-49b3-9400-ad75390d7845"
+                    ],
+                    "column_name": "policy_uuid",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Apply All Patches"
+                    ],
+                    "column_name": "policy_name",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.organization_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        "123456"
+                    ],
+                    "column_name": "org_id",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.create_time",
+                    "data_type": "string",
+                    "example_values": [
+                        "2023-10-10T15:19:53+0000"
+                    ],
+                    "column_name": "create_time",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "active",
+                        "inactive"
+                    ],
+                    "column_name": "status",
+                    "column_order": 8
                 },
                 {
                     "data_path": "action_result.message",
@@ -748,6 +887,207 @@
                     ],
                     "column_name": "version",
                     "column_order": 16
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list software",
+            "identifier": "list_software",
+            "description": "This action is used to retrieve a list of software installed on a device",
+            "verbose": "This action is used to retrieve a list of software installed on a device.",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "org_id": {
+                    "description": "Organization ID",
+                    "data_type": "numeric",
+                    "required": false,
+                    "primary": false,
+                    "contains": [],
+                    "value_list": [],
+                    "default": "",
+                    "order": 0,
+                    "name": "org_id",
+                    "id": 1,
+                    "param_name": "org_id"
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.parameter.path_params.org_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        "123456"
+                    ],
+                    "contains": [],
+                    "column_name": "provided_org_id",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_name": "status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.*.create_time",
+                    "data_type": "string",
+                    "example_values": [
+                        "2023-10-10T15:19:53+0000"
+                    ],
+                    "column_name": "create_time",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.*.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "KB4052623",
+                        "NotepadPlusPlus_64",
+                        "a32ca1d0-ddd4-486b-b708-d941db4fb4aa",
+                        "{ACA17529-C1C0-41AE-8D8A-BAD5FD55FDE1}"
+                    ],
+                    "column_name": "package_name",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.*.display_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Update for Windows Defender Antivirus antimalware platform - KB4052623",
+                        "NotepadPlusPlus",
+                        "Parallels Tools",
+                        "2024-11 Update for Windows 11 Version 24H2 for ARM64-based Systems (KB5048779)"
+                    ],
+                    "column_name": "display_name",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.*.id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        "123456789"
+                    ],
+                    "column_name": "package_id",
+                    "column_order": 5
+                },
+                {
+                    "data_path": "action_result.data.*.*.installed",
+                    "data_type": "string",
+                    "example_values": [
+                        "True",
+                        "False"
+                    ],
+                    "column_name": "installed",
+                    "column_order": 6
+                },
+                {
+                    "data_path": "action_result.data.*.*.organization_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        "123456"
+                    ],
+                    "column_name": "org_id",
+                    "column_order": 7
+                },
+                {
+                    "data_path": "action_result.data.*.*.os_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "11 Pro",
+                        "OS X"
+                    ],
+                    "column_name": "os_name",
+                    "column_order": 8
+                },
+                {
+                    "data_path": "action_result.data.*.*.os_version",
+                    "data_type": "string",
+                    "example_values": [
+                        "10.0.26100",
+                        "12.2"
+                    ],
+                    "column_name": "os_version",
+                    "column_order": 9
+                },
+                {
+                    "data_path": "action_result.data.*.*.package_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        "12345678"
+                    ],
+                    "column_name": "package_id",
+                    "column_order": 10
+                },
+                {
+                    "data_path": "action_result.data.*.*.package_version_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        "123456789"
+                    ],
+                    "column_name": "package_version_id",
+                    "column_order": 11
+                },
+                {
+                    "data_path": "action_result.data.*.*.repo",
+                    "data_type": "string",
+                    "example_values": [
+                        "WindowsUpdate",
+                        "ReportingOnly",
+                        "Microsoft",
+                        "Installed"
+                    ],
+                    "column_name": "repo",
+                    "column_order": 12
+                },
+                {
+                    "data_path": "action_result.data.*.*.server_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        "123456"
+                    ],
+                    "column_name": "device_id",
+                    "column_order": 13
+                },
+                {
+                    "data_path": "action_result.data.*.*.software_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        "123456"
+                    ],
+                    "column_name": "software_id",
+                    "column_order": 14
+                },
+                {
+                    "data_path": "action_result.data.*.*.version",
+                    "data_type": "string",
+                    "example_values": [
+                        "1.0.0",
+                        "4.18.2001.10",
+                        "200"
+                    ],
+                    "column_name": "version",
+                    "column_order": 15
                 },
                 {
                     "data_path": "action_result.message",
@@ -1260,7 +1600,7 @@
                     "column_order": 6
                 },
                 {
-                    "data_path": "action_result.data.*.orgs",
+                    "data_path": "action_result.data.*.orgs_formatted",
                     "data_type": "string",
                     "example_values": [
                         "Hank's Propane Accessories (123456)",
@@ -1290,7 +1630,7 @@
                     "column_order": 9
                 },
                 {
-                    "data_path": "action_result.data.*.rbac_roles",
+                    "data_path": "action_result.data.*.rbac_roles_formatted",
                     "data_type": "string",
                     "example_values": [
                         "Zone Administrator (123456)",
@@ -1321,10 +1661,6 @@
                 {
                     "data_path": "action_result.message",
                     "data_type": "string"
-                },
-                {
-                    "data_path": "summary.total_objects",
-                    "data_type": "numeric"
                 },
                 {
                     "data_path": "summary.total_objects_successful",
@@ -1417,7 +1753,7 @@
                     "column_order": 5
                 },
                 {
-                    "data_path": "action_result.data.*.orgs",
+                    "data_path": "action_result.data.*.orgs_formatted",
                     "data_type": "string",
                     "example_values": [
                         "Hank's Propane Accessories (123456)",
@@ -1447,7 +1783,7 @@
                     "column_order": 8
                 },
                 {
-                    "data_path": "action_result.data.*.rbac_roles",
+                    "data_path": "action_result.data.*.rbac_roles_formatted",
                     "data_type": "string",
                     "example_values": [
                         "Zone Administrator (123456)",
