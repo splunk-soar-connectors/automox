@@ -107,7 +107,7 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.parameter.query_params.o",
+                    "data_path": "action_result.parameter.org_id",
                     "data_type": "numeric",
                     "example_values": [
                         "123456"
@@ -117,7 +117,7 @@
                     "column_order": 0
                 },
                 {
-                    "data_path": "action_result.parameter.aux_params.device_id",
+                    "data_path": "action_result.parameter.device_id",
                     "data_type": "numeric",
                     "example_values": [
                         "123456"
@@ -127,7 +127,7 @@
                     "column_order": 1
                 },
                 {
-                    "data_path": "action_result.parameter.path_params.policy_id",
+                    "data_path": "action_result.parameter.policy_id",
                     "data_type": "numeric",
                     "example_values": [
                         "123456"
@@ -188,7 +188,7 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.parameter.query_params.o",
+                    "data_path": "action_result.parameter.org_id",
                     "data_type": "numeric",
                     "example_values": [
                         "123456"
@@ -312,12 +312,12 @@
                     "order": 1,
                     "name": "policy_id",
                     "id": 2,
-                    "param_name": "org_id"
+                    "param_name": "policy_id"
                 }
             },
             "output": [
                 {
-                    "data_path": "action_result.parameter.query_params.o",
+                    "data_path": "action_result.parameter.org_id",
                     "data_type": "numeric",
                     "example_values": [
                         "123456"
@@ -327,7 +327,7 @@
                     "column_order": 0
                 },
                 {
-                    "data_path": "action_result.parameter.path_params.policy_id",
+                    "data_path": "action_result.parameter.policy_id",
                     "data_type": "numeric",
                     "example_values": [
                         "123456"
@@ -443,7 +443,7 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.parameter.query_params.o",
+                    "data_path": "action_result.parameter.org_id",
                     "data_type": "string",
                     "example_values": [
                         "123456"
@@ -719,7 +719,7 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.parameter.path_params.device_id",
+                    "data_path": "action_result.parameter.device_id",
                     "data_type": "numeric",
                     "example_values": [
                         "123456"
@@ -729,7 +729,7 @@
                     "column_order": 0
                 },
                 {
-                    "data_path": "action_result.parameter.query_params.o",
+                    "data_path": "action_result.parameter.org_id",
                     "data_type": "numeric",
                     "example_values": [
                         "123456"
@@ -930,7 +930,7 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.parameter.path_params.org_id",
+                    "data_path": "action_result.parameter.org_id",
                     "data_type": "numeric",
                     "example_values": [
                         "123456"
@@ -1144,7 +1144,7 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.parameter.path_params.device_id",
+                    "data_path": "action_result.parameter.device_id",
                     "data_type": "numeric",
                     "example_values": [
                         "123456"
@@ -1154,7 +1154,7 @@
                     "column_order": 0
                 },
                 {
-                    "data_path": "action_result.parameter.query_params.o",
+                    "data_path": "action_result.parameter.org_id",
                     "data_type": "numeric",
                     "example_values": [
                         "123456"
@@ -1339,7 +1339,7 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.parameter.aux_params.hostname",
+                    "data_path": "action_result.parameter.hostname",
                     "data_type": "string",
                     "example_values": [
                         "SERVER01"
@@ -1351,7 +1351,7 @@
                     "column_order": 0
                 },
                 {
-                    "data_path": "action_result.parameter.query_params.o",
+                    "data_path": "action_result.parameter.org_id",
                     "data_type": "numeric",
                     "example_values": [
                         "123456"
@@ -1532,7 +1532,7 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.parameter.query_params.o",
+                    "data_path": "action_result.parameter.org_id",
                     "data_type": "numeric",
                     "example_values": [
                         "123456"
@@ -1542,7 +1542,7 @@
                     "column_order": 0
                 },
                 {
-                    "data_path": "action_result.parameter.path_params.user_id",
+                    "data_path": "action_result.parameter.user_id",
                     "data_type": "numeric",
                     "example_values": [
                         "123456"
@@ -1698,7 +1698,7 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.parameter.query_params.o",
+                    "data_path": "action_result.parameter.org_id",
                     "data_type": "numeric",
                     "example_values": [
                         "123456"
@@ -1870,7 +1870,7 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.parameter.aux_params.ip_address",
+                    "data_path": "action_result.parameter.ip_address",
                     "data_type": "string",
                     "example_values": [
                         "192.168.1.1"
@@ -1882,7 +1882,7 @@
                     "column_order": 0
                 },
                 {
-                    "data_path": "action_result.parameter.query_params.o",
+                    "data_path": "action_result.parameter.org_id",
                     "data_type": "numeric",
                     "example_values": [
                         "123456"
@@ -2054,7 +2054,7 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.parameter.query_params.o",
+                    "data_path": "action_result.parameter.org_id",
                     "data_type": "numeric",
                     "example_values": [
                         "123456"
@@ -2169,7 +2169,7 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.parameter.path_params.device_id",
+                    "data_path": "action_result.parameter.device_id",
                     "data_type": "numeric",
                     "example_values": [
                         "123456"
@@ -2179,7 +2179,7 @@
                     "column_order": 0
                 },
                 {
-                    "data_path": "action_result.parameter.query_params.o",
+                    "data_path": "action_result.parameter.org_id",
                     "data_type": "numeric",
                     "example_values": [
                         "123456"
@@ -2329,7 +2329,7 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.parameter.path_params.account_uuid",
+                    "data_path": "action_result.parameter.account_uuid",
                     "data_type": "string",
                     "example_values": [
                         "8cbea739-abaf-49b3-9400-ad75390d7845"
@@ -2339,7 +2339,7 @@
                     "column_order": 0
                 },
                 {
-                    "data_path": "action_result.parameter.path_params.user_uuid",
+                    "data_path": "action_result.parameter.user_uuid",
                     "data_type": "string",
                     "example_values": [
                         "8cbea739-abaf-49b3-9400-ad75390d7845"
@@ -2464,7 +2464,7 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.parameter.path_params.device_id",
+                    "data_path": "action_result.parameter.device_id",
                     "data_type": "numeric",
                     "example_values": [
                         "123456"
@@ -2474,7 +2474,7 @@
                     "column_order": 0
                 },
                 {
-                    "data_path": "action_result.parameter.query_params.o",
+                    "data_path": "action_result.parameter.org_id",
                     "data_type": "numeric",
                     "example_values": [
                         "123456"
@@ -2484,7 +2484,7 @@
                     "column_order": 1
                 },
                 {
-                    "data_path": "action_result.parameter.aux_params.exception",
+                    "data_path": "action_result.parameter.exception",
                     "data_type": "boolean",
                     "example_values": [
                         "true",
@@ -2495,7 +2495,7 @@
                     "column_order": 2
                 },
                 {
-                    "data_path": "action_result.parameter.aux_params.server_group_id",
+                    "data_path": "action_result.parameter.server_group_id",
                     "data_type": "numeric",
                     "example_values": [
                         "123456"
@@ -2505,7 +2505,7 @@
                     "column_order": 3
                 },
                 {
-                    "data_path": "action_result.parameter.aux_params.tags",
+                    "data_path": "action_result.parameter.tags",
                     "data_type": "string",
                     "example_values": [
                         "tag1, tag2",
@@ -2516,7 +2516,7 @@
                     "column_order": 4
                 },
                 {
-                    "data_path": "action_result.parameter.aux_params.custom_name",
+                    "data_path": "action_result.parameter.custom_name",
                     "data_type": "string",
                     "example_values": [
                         "My Server"
@@ -2586,7 +2586,7 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.parameter.path_params.device_id",
+                    "data_path": "action_result.parameter.device_id",
                     "data_type": "numeric",
                     "example_values": [
                         "123456"
@@ -2596,7 +2596,7 @@
                     "column_order": 0
                 },
                 {
-                    "data_path": "action_result.parameter.query_params.o",
+                    "data_path": "action_result.parameter.org_id",
                     "data_type": "numeric",
                     "example_values": [
                         "123456"
