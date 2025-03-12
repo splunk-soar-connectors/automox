@@ -142,6 +142,10 @@
                     "column_order": 2
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.message",
                     "data_type": "string"
                 },
@@ -250,6 +254,10 @@
                     ],
                     "column_name": "status",
                     "column_order": 6
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.message",
@@ -385,6 +393,10 @@
                     ],
                     "column_name": "status",
                     "column_order": 7
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.message",
@@ -559,6 +571,10 @@
                     "column_order": 11
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.message",
                     "data_type": "string"
                 },
@@ -638,6 +654,10 @@
                     ],
                     "column_name": "device_count",
                     "column_order": 5
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.message",
@@ -804,7 +824,7 @@
                         "12345678"
                     ],
                     "column_name": "package_id",
-                    "column_order": 11
+                    "column_order": 10
                 },
                 {
                     "data_path": "action_result.data.*.*.package_version_id",
@@ -813,7 +833,7 @@
                         "123456789"
                     ],
                     "column_name": "package_version_id",
-                    "column_order": 12
+                    "column_order": 11
                 },
                 {
                     "data_path": "action_result.data.*.*.repo",
@@ -825,7 +845,7 @@
                         "Installed"
                     ],
                     "column_name": "repo",
-                    "column_order": 13
+                    "column_order": 12
                 },
                 {
                     "data_path": "action_result.data.*.*.server_id",
@@ -837,7 +857,7 @@
                         "device id"
                     ],
                     "column_name": "device_id",
-                    "column_order": 14
+                    "column_order": 13
                 },
                 {
                     "data_path": "action_result.data.*.*.software_id",
@@ -846,7 +866,7 @@
                         "123456"
                     ],
                     "column_name": "software_id",
-                    "column_order": 15
+                    "column_order": 14
                 },
                 {
                     "data_path": "action_result.data.*.*.version",
@@ -857,7 +877,11 @@
                         "200"
                     ],
                     "column_name": "version",
-                    "column_order": 16
+                    "column_order": 15
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.message",
@@ -1053,6 +1077,10 @@
                     ],
                     "column_name": "version",
                     "column_order": 14
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.message",
@@ -1252,6 +1280,10 @@
                     "column_order": 12
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.message",
                     "data_type": "string"
                 },
@@ -1449,6 +1481,10 @@
                     "column_order": 12
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.message",
                     "data_type": "string"
                 },
@@ -1633,6 +1669,10 @@
                     "column_order": 11
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.message",
                     "data_type": "string"
                 },
@@ -1791,6 +1831,10 @@
                     ],
                     "column_name": "primary_account_uuid",
                     "column_order": 10
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.message",
@@ -1990,6 +2034,10 @@
                     "column_order": 12
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.message",
                     "data_type": "string"
                 },
@@ -2088,6 +2136,10 @@
                     ],
                     "column_name": "device_count",
                     "column_order": 5
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.message",
@@ -2249,6 +2301,10 @@
                     "column_order": 10
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.message",
                     "data_type": "string"
                 },
@@ -2321,6 +2377,10 @@
                     ],
                     "column_name": "provided_user_uuid",
                     "column_order": 1
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.message",
@@ -2495,6 +2555,10 @@
                     "column_order": 5
                 },
                 {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.message",
                     "data_type": "string"
                 },
@@ -2566,6 +2630,10 @@
                     ],
                     "column_name": "provided_org_id",
                     "column_order": 1
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.message",
