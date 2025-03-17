@@ -106,16 +106,6 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.parameter.org_id",
-                    "data_type": "numeric",
-                    "example_values": [
-                        "123456"
-                    ],
-                    "contains": [
-                        "org id"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.query_params.o",
                     "data_type": "numeric",
                     "example_values": [
@@ -195,16 +185,6 @@
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.parameter.org_id",
-                    "data_type": "numeric",
-                    "example_values": [
-                        "123456"
-                    ],
-                    "contains": [
-                        "org id"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.query_params.o",
                     "data_type": "numeric",
@@ -333,16 +313,6 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.parameter.org_id",
-                    "data_type": "numeric",
-                    "example_values": [
-                        "123456"
-                    ],
-                    "contains": [
-                        "org id"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.query_params.o",
                     "data_type": "numeric",
                     "example_values": [
@@ -468,16 +438,6 @@
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.parameter.org_id",
-                    "data_type": "numeric",
-                    "example_values": [
-                        "123456"
-                    ],
-                    "contains": [
-                        "org id"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.query_params.o",
                     "data_type": "string",
@@ -753,16 +713,6 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.parameter.org_id",
-                    "data_type": "numeric",
-                    "example_values": [
-                        "123456"
-                    ],
-                    "contains": [
-                        "org id"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.aux_params.device_id",
                     "data_type": "numeric",
                     "example_values": [
@@ -973,16 +923,6 @@
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.parameter.org_id",
-                    "data_type": "numeric",
-                    "example_values": [
-                        "123456"
-                    ],
-                    "contains": [
-                        "org id"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.query_params.o",
                     "data_type": "numeric",
@@ -1196,16 +1136,6 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.parameter.org_id",
-                    "data_type": "numeric",
-                    "example_values": [
-                        "123456"
-                    ],
-                    "contains": [
-                        "org id"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.aux_params.device_id",
                     "data_type": "numeric",
                     "example_values": [
@@ -1407,16 +1337,6 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.parameter.org_id",
-                    "data_type": "numeric",
-                    "example_values": [
-                        "123456"
-                    ],
-                    "contains": [
-                        "org id"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.aux_params.hostname",
                     "data_type": "string",
                     "example_values": [
@@ -1615,16 +1535,6 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.parameter.org_id",
-                    "data_type": "numeric",
-                    "example_values": [
-                        "123456"
-                    ],
-                    "contains": [
-                        "org id"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.query_params.o",
                     "data_type": "numeric",
                     "example_values": [
@@ -1800,16 +1710,6 @@
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.parameter.org_id",
-                    "data_type": "numeric",
-                    "example_values": [
-                        "123456"
-                    ],
-                    "contains": [
-                        "org id"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.query_params.o",
                     "data_type": "numeric",
@@ -1989,16 +1889,6 @@
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.parameter.org_id",
-                    "data_type": "numeric",
-                    "example_values": [
-                        "123456"
-                    ],
-                    "contains": [
-                        "org id"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.aux_params.ip_address",
                     "data_type": "string",
@@ -2188,16 +2078,6 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.parameter.org_id",
-                    "data_type": "numeric",
-                    "example_values": [
-                        "123456"
-                    ],
-                    "contains": [
-                        "org id"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.query_params.o",
                     "data_type": "numeric",
                     "example_values": [
@@ -2310,16 +2190,6 @@
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.parameter.org_id",
-                    "data_type": "numeric",
-                    "example_values": [
-                        "123456"
-                    ],
-                    "contains": [
-                        "org id"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.aux_params.device_id",
                     "data_type": "numeric",
@@ -2613,16 +2483,6 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.parameter.org_id",
-                    "data_type": "numeric",
-                    "example_values": [
-                        "123456"
-                    ],
-                    "contains": [
-                        "org id"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.aux_params.device_id",
                     "data_type": "numeric",
                     "example_values": [
@@ -2747,16 +2607,6 @@
                 }
             },
             "output": [
-                {
-                    "data_path": "action_result.parameter.org_id",
-                    "data_type": "numeric",
-                    "example_values": [
-                        "123456"
-                    ],
-                    "contains": [
-                        "org id"
-                    ]
-                },
                 {
                     "data_path": "action_result.parameter.aux_params.device_id",
                     "data_type": "numeric",
