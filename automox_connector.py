@@ -62,9 +62,15 @@ class Params:
         if query_params is None:
             query_params = {}
 
-        self._query_params = query_params  # {"description": "Query parameters for the API request"}
-        self._path_params = path_params  # {"description": "Path parameters for the API request"}
-        self._aux_params = dict(kwargs)  # {"description": "Additional parameters for the API request"}
+        self._query_params = (
+            query_params  # {"description": "Query parameters for the API request"}
+        )
+        self._path_params = (
+            path_params  # {"description": "Path parameters for the API request"}
+        )
+        self._aux_params = dict(
+            kwargs
+        )  # {"description": "Additional parameters for the API request"}
 
     def get_query_params(self) -> Dict[str, str]:
         """Get a copy of query parameters"""
@@ -92,7 +98,11 @@ class Params:
 
     def to_dict(self) -> Dict[str, Dict[str, Any]]:
         """Get all parameters as a dictionary"""
-        return {"query_params": self.get_query_params(), "path_params": self.get_path_params(), "aux_params": self.get_aux_params()}
+        return {
+            "query_params": self.get_query_params(),
+            "path_params": self.get_path_params(),
+            "aux_params": self.get_aux_params(),
+        }
 
     def get_params(self) -> Tuple[Dict[str, str], Dict[str, str]]:
         """Get parameters for URL building"""
@@ -148,37 +158,61 @@ class AutomoxConnector(BaseConnector):
                 # init params
                 processed_params = {}
 
-                param_mappings = {"org_id": "o"}  # Map org_id to o since that's what the API uses
+                param_mappings = {
+                    "org_id": "o"
+                }  # Map org_id to o since that's what the API uses
 
                 # Extract path parameters from input param if they exist
                 if "params" in action_config:
                     if "path_params" in action_config["params"]:
-                        processed_params["path_params"] = {key: param[key] for key in action_config["params"]["path_params"] if key in param}
+                        processed_params["path_params"] = {
+                            key: param[key]
+                            for key in action_config["params"]["path_params"]
+                            if key in param
+                        }
 
                     # Handle query parameters if defined
                     if "query_params" in action_config["params"]:
                         processed_params["query_params"] = {
-                            param_mappings.get(key, key): param[key]  # Use mapped name if exists
+                            param_mappings.get(key, key): param[
+                                key
+                            ]  # Use mapped name if exists
                             for key in action_config["params"]["query_params"]
                             if key in param
                         }
 
                     # Handle auxiliary parameters if defined (like POST body params)
                     if "aux_params" in action_config["params"]:
-                        processed_params.update({key: param[key] for key in action_config["params"]["aux_params"] if key in param})
+                        processed_params.update(
+                            {
+                                key: param[key]
+                                for key in action_config["params"]["aux_params"]
+                                if key in param
+                            }
+                        )
 
                 # Create action object with updated parameters
                 action = self.AutomoxAction(
                     base_endpoint=action_config["base_endpoint"],
-                    handle_function=getattr(self, action_config.get("handler_function", "_handle_generic")),
-                    fetch_function=getattr(self, action_config.get("fetch_function")) if action_config.get("fetch_function") else None,
-                    fetch_function_method=action_config.get("fetch_function_method", "get"),
-                    params=Params(**processed_params) if processed_params else Params(**param),
+                    handle_function=getattr(
+                        self, action_config.get("handler_function", "_handle_generic")
+                    ),
+                    fetch_function=getattr(self, action_config.get("fetch_function"))
+                    if action_config.get("fetch_function")
+                    else None,
+                    fetch_function_method=action_config.get(
+                        "fetch_function_method", "get"
+                    ),
+                    params=Params(**processed_params)
+                    if processed_params
+                    else Params(**param),
                     summary_key=action_config.get("summary_key"),
                 )
 
                 # If the action has a specific handler implementation function, use that
-                if "handler_function" in action_config and action_config["handler_function"].endswith("_impl"):
+                if "handler_function" in action_config and action_config[
+                    "handler_function"
+                ].endswith("_impl"):
                     return getattr(self, action_config["handler_function"])(action)
 
                 # or just use the generic handler
@@ -218,7 +252,11 @@ class AutomoxConnector(BaseConnector):
             self.fetch_function = fetch_function
             self.fetch_function_method = fetch_function_method.lower()
             # Convert dict to Params at creation time
-            self.params = Params() if params is None else (params if isinstance(params, Params) else Params(**params))
+            self.params = (
+                Params()
+                if params is None
+                else (params if isinstance(params, Params) else Params(**params))
+            )
             self.summary_key = summary_key
 
     def __init__(self):
@@ -236,7 +274,10 @@ class AutomoxConnector(BaseConnector):
         # that needs to be accessed across actions
         self._state = self.load_state()
         self._base_url = AUTOMOX_CONSOLE_API_URL
-        self._headers = {"Content-Type": "application/json", "Authorization": f"Bearer {config['ax_console_api_key']}"}
+        self._headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {config['ax_console_api_key']}",
+        }
         self._page_limit = int(config.get("page_limit", 100))
 
         return phantom.APP_SUCCESS
@@ -244,7 +285,9 @@ class AutomoxConnector(BaseConnector):
     # Helper functions
 
     def _get_endpoint(self, action: AutomoxAction) -> str:
-        return self._build_url_for_action(base_endpoint=action.base_endpoint, action=action)
+        return self._build_url_for_action(
+            base_endpoint=action.base_endpoint, action=action
+        )
 
     def _build_url_for_action(self, base_endpoint: str, action: AutomoxAction) -> str:
         """
@@ -265,7 +308,9 @@ class AutomoxConnector(BaseConnector):
                 if placeholder in base_endpoint:
                     base_endpoint = base_endpoint.replace(placeholder, safe_value)
                 else:
-                    self.debug_print(f"Warning: Path param key '{key}' not found in endpoint.")
+                    self.debug_print(
+                        f"Warning: Path param key '{key}' not found in endpoint."
+                    )
 
         # Filter out None or empty values from query parameters
         if query_params:
@@ -281,14 +326,23 @@ class AutomoxConnector(BaseConnector):
         return full_url
 
     @staticmethod
-    def _process_empty_response(response: requests.Response, action_result: ActionResult) -> RetVal:
+    def _process_empty_response(
+        response: requests.Response, action_result: ActionResult
+    ) -> RetVal:
         if response.status_code in [200, 204]:
             return RetVal(phantom.APP_SUCCESS, {})
 
-        return RetVal(action_result.set_status(phantom.APP_ERROR, "Empty response and no information in the header"), None)
+        return RetVal(
+            action_result.set_status(
+                phantom.APP_ERROR, "Empty response and no information in the header"
+            ),
+            None,
+        )
 
     @staticmethod
-    def _process_html_response(response: requests.Response, action_result: ActionResult) -> RetVal:
+    def _process_html_response(
+        response: requests.Response, action_result: ActionResult
+    ) -> RetVal:
         status_code = response.status_code
 
         try:
@@ -306,11 +360,18 @@ class AutomoxConnector(BaseConnector):
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     @staticmethod
-    def _process_json_response(r: requests.Response, action_result: ActionResult) -> RetVal:
+    def _process_json_response(
+        r: requests.Response, action_result: ActionResult
+    ) -> RetVal:
         try:
             resp_json = r.json()
         except Exception as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, f"Unable to parse JSON response. Error: {str(e)}"), None)
+            return RetVal(
+                action_result.set_status(
+                    phantom.APP_ERROR, f"Unable to parse JSON response. Error: {str(e)}"
+                ),
+                None,
+            )
 
         if 200 <= r.status_code < 400:
             return RetVal(phantom.APP_SUCCESS, resp_json)
@@ -319,7 +380,9 @@ class AutomoxConnector(BaseConnector):
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
-    def _process_response(self, r: requests.Response, action_result: ActionResult) -> RetVal:
+    def _process_response(
+        self, r: requests.Response, action_result: ActionResult
+    ) -> RetVal:
         if hasattr(action_result, "add_debug_data"):
             action_result.add_debug_data({"r_status_code": r.status_code})
             action_result.add_debug_data({"r_text": r.text})
@@ -333,14 +396,17 @@ class AutomoxConnector(BaseConnector):
         if not r.text:
             return self._process_empty_response(r, action_result)
 
-        message = (
-            f"Can't process response from server. Status Code: {r.status_code} Data from server: {r.text.replace('{', '{{').replace('}', '}}')}"
-        )
+        message = f"Can't process response from server. Status Code: {r.status_code} Data from server: {r.text.replace('{', '{{').replace('}', '}}')}"
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
     def _make_rest_call(
-        self, endpoint: str, action_result: ActionResult, method: str = "get", headers: Optional[Dict[str, str]] = None, **kwargs
+        self,
+        endpoint: str,
+        action_result: ActionResult,
+        method: str = "get",
+        headers: Optional[Dict[str, str]] = None,
+        **kwargs,
     ) -> RetVal:
         config = self.get_config()
 
@@ -349,19 +415,38 @@ class AutomoxConnector(BaseConnector):
         try:
             request_func = getattr(requests, method)
         except AttributeError:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, f"Invalid method: {method}"), resp_json)
+            return RetVal(
+                action_result.set_status(
+                    phantom.APP_ERROR, f"Invalid method: {method}"
+                ),
+                resp_json,
+            )
 
         url = self._base_url + endpoint
 
         try:
-            r = request_func(url, verify=config.get("verify_server_cert", False), headers=headers, **kwargs)
+            r = request_func(
+                url,
+                verify=config.get("verify_server_cert", False),
+                headers=headers,
+                **kwargs,
+            )
         except Exception as e:
-            return RetVal(action_result.set_status(phantom.APP_ERROR, f"Error Connecting to server. Details: {str(e)}"), resp_json)
+            return RetVal(
+                action_result.set_status(
+                    phantom.APP_ERROR, f"Error Connecting to server. Details: {str(e)}"
+                ),
+                resp_json,
+            )
 
         return self._process_response(r, action_result)
 
     def _fetch_paginated_data(
-        self, endpoint: str, params: Union[Params, Dict[str, Any]], action_result: ActionResult, headers: Dict[str, str]
+        self,
+        endpoint: str,
+        params: Union[Params, Dict[str, Any]],
+        action_result: ActionResult,
+        headers: Dict[str, str],
     ) -> Tuple[int, List[Dict[str, Any]]]:
         """Fetches all pages of data from a paginated API endpoint."""
         params_obj = params if isinstance(params, Params) else Params(**params)
@@ -370,7 +455,10 @@ class AutomoxConnector(BaseConnector):
 
         while True:
             ret_val, response = self._make_rest_call(
-                endpoint=endpoint, action_result=action_result, params=paginated_params.get_query_params(), headers=headers
+                endpoint=endpoint,
+                action_result=action_result,
+                params=paginated_params.get_query_params(),
+                headers=headers,
             )
 
             if phantom.is_fail(ret_val):
@@ -380,12 +468,16 @@ class AutomoxConnector(BaseConnector):
 
             # If we receive fewer items than the limit, we've hit the last page
             if len(response) < self._page_limit:
-                self.debug_print(f"Received {len(response)} items, which is less than page limit {self._page_limit}. This is the last page.")
+                self.debug_print(
+                    f"Received {len(response)} items, which is less than page limit {self._page_limit}. This is the last page."
+                )
                 break
 
             # If we receive exact the limit, check for next page
             if len(response) == self._page_limit:
-                self.debug_print("Got full page per page limit, checking for next page...")
+                self.debug_print(
+                    "Got full page per page limit, checking for next page..."
+                )
                 paginated_params = self.next_page(paginated_params)  # get the next page
                 self.debug_print(f"Next page params: {paginated_params.to_dict()}")
                 continue
@@ -413,7 +505,9 @@ class AutomoxConnector(BaseConnector):
 
         return Params(query_params=query_params, path_params=params.get_path_params())
 
-    def _get_total_device_count(self, endpoint: str, action_result: ActionResult) -> int:
+    def _get_total_device_count(
+        self, endpoint: str, action_result: ActionResult
+    ) -> int:
         ret_val, response = self._make_rest_call(
             endpoint=endpoint,
             action_result=action_result,
@@ -422,7 +516,9 @@ class AutomoxConnector(BaseConnector):
         )
 
         if phantom.is_fail(ret_val):
-            raise Exception(f"Failed to get total device count: {action_result.get_message()}")
+            raise Exception(
+                f"Failed to get total device count: {action_result.get_message()}"
+            )
 
         return response[0].get("total_count", 0)
 
@@ -439,7 +535,9 @@ class AutomoxConnector(BaseConnector):
         """
         return value is not None
 
-    def remove_null_values(self, item: Union[Dict[str, Any], List[Any], Any]) -> Union[Dict[str, Any], List[Any], Any]:
+    def remove_null_values(
+        self, item: Union[Dict[str, Any], List[Any], Any]
+    ) -> Union[Dict[str, Any], List[Any], Any]:
         """
         Recursively remove null values from a dictionary or list
         """
@@ -447,18 +545,22 @@ class AutomoxConnector(BaseConnector):
             return {
                 key: self.remove_null_values(value)
                 for key, value in item.items()
-                if self._is_valid_number(value) and self._is_valid_number(self.remove_null_values(value))
+                if self._is_valid_number(value)
+                and self._is_valid_number(self.remove_null_values(value))
             }
         elif isinstance(item, list):
             return [
                 self.remove_null_values(value)
                 for value in item
-                if self._is_valid_number(value) and self._is_valid_number(self.remove_null_values(value))
+                if self._is_valid_number(value)
+                and self._is_valid_number(self.remove_null_values(value))
             ]
         return item
 
     @staticmethod
-    def _find_matching_devices(devices: List[Device], attributes: List[str], value: str) -> List[Device]:
+    def _find_matching_devices(
+        devices: List[Device], attributes: List[str], value: str
+    ) -> List[Device]:
         """
         Searches for all devices matching specified attributes and value.
 
@@ -477,10 +579,15 @@ class AutomoxConnector(BaseConnector):
 
                 if attr_value is None:
                     continue
-                if isinstance(attr_value, str) and attr_value.casefold() == value.casefold():
+                if (
+                    isinstance(attr_value, str)
+                    and attr_value.casefold() == value.casefold()
+                ):
                     matches.append(device)
                     break
-                if isinstance(attr_value, list) and value.lower() in (v.lower() for v in attr_value):
+                if isinstance(attr_value, list) and value.lower() in (
+                    v.lower() for v in attr_value
+                ):
                     matches.append(device)
                     break
         return matches
@@ -518,14 +625,21 @@ class AutomoxConnector(BaseConnector):
         paginated_params = self.first_page(params)
 
         for current_page in range(max_pages):
-            self.debug_print(f"Fetching devices with params: {paginated_params.to_dict()}")
+            self.debug_print(
+                f"Fetching devices with params: {paginated_params.to_dict()}"
+            )
 
             ret_val, devices = self._make_rest_call(
-                endpoint=endpoint, action_result=action_result, params=paginated_params.get_query_params(), headers=self._headers
+                endpoint=endpoint,
+                action_result=action_result,
+                params=paginated_params.get_query_params(),
+                headers=self._headers,
             )
 
             if phantom.is_fail(ret_val):
-                self.debug_print(f"Failed to get devices: {action_result.get_message()}")
+                self.debug_print(
+                    f"Failed to get devices: {action_result.get_message()}"
+                )
                 raise Exception(f"Failed to get devices: {action_result.get_message()}")
 
             page_matches = self._find_matching_devices(devices, attributes, value)
@@ -558,7 +672,9 @@ class AutomoxConnector(BaseConnector):
         # Include POST body if fetch_function_method is POST
         if action.fetch_function_method.lower() == "post":
             fetch_function_kwargs["method"] = "post"
-            fetch_function_kwargs["data"] = json.dumps(action.params.get_aux_param_by_key("body"))
+            fetch_function_kwargs["data"] = json.dumps(
+                action.params.get_aux_param_by_key("body")
+            )
 
         # Do a DELETE if fetch_function_method is DELETE
         if action.fetch_function_method.lower() == "delete":
@@ -597,23 +713,37 @@ class AutomoxConnector(BaseConnector):
         ip_pattern = re.compile(r"^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$")
 
         if not ip_pattern.match(ip_address):
-            return action_result.set_status(phantom.APP_ERROR, f"Invalid IP address format: {ip_address}")
+            return action_result.set_status(
+                phantom.APP_ERROR, f"Invalid IP address format: {ip_address}"
+            )
 
         try:
             # Search for devices with matching public IP
             matches = self.find_devices_by_attribute_with_value(
-                endpoint=endpoint, attributes=["ip_addrs"], value=ip_address, action_result=action_result, params=action.params
+                endpoint=endpoint,
+                attributes=["ip_addrs"],
+                value=ip_address,
+                action_result=action_result,
+                params=action.params,
             )
 
             # If no matches found with public IP, try private IPs
             if not matches:
-                self.save_progress("No devices found using public IP. Trying private IPs...")
+                self.save_progress(
+                    "No devices found using public IP. Trying private IPs..."
+                )
                 matches = self.find_devices_by_attribute_with_value(
-                    endpoint=endpoint, attributes=["ip_addrs_private"], value=ip_address, action_result=action_result, params=action.params
+                    endpoint=endpoint,
+                    attributes=["ip_addrs_private"],
+                    value=ip_address,
+                    action_result=action_result,
+                    params=action.params,
                 )
 
             if not matches:
-                return action_result.set_status(phantom.APP_ERROR, f"No devices found with IP address {ip_address}")
+                return action_result.set_status(
+                    phantom.APP_ERROR, f"No devices found with IP address {ip_address}"
+                )
 
             # Add all matching devices to the result
             for device in matches:
@@ -627,7 +757,9 @@ class AutomoxConnector(BaseConnector):
 
         except Exception as e:
             self.debug_print(f"Exception occurred: {str(e)}")
-            return action_result.set_status(phantom.APP_ERROR, f"Error finding devices by IP address: {str(e)}")
+            return action_result.set_status(
+                phantom.APP_ERROR, f"Error finding devices by IP address: {str(e)}"
+            )
 
     def _handle_get_device_by_hostname_impl(self, action: AutomoxAction) -> int:
         """
@@ -650,11 +782,17 @@ class AutomoxConnector(BaseConnector):
 
         try:
             matches = self.find_devices_by_attribute_with_value(
-                endpoint=endpoint, attributes=["name"], value=hostname, action_result=action_result, params=action.params
+                endpoint=endpoint,
+                attributes=["name"],
+                value=hostname,
+                action_result=action_result,
+                params=action.params,
             )
 
             if not matches:
-                return action_result.set_status(phantom.APP_ERROR, f"No devices found with hostname {hostname}")
+                return action_result.set_status(
+                    phantom.APP_ERROR, f"No devices found with hostname {hostname}"
+                )
 
             # Add all matching devices to the result
             for device in matches:
@@ -668,7 +806,9 @@ class AutomoxConnector(BaseConnector):
 
         except Exception as e:
             self.debug_print(f"Exception occurred: {str(e)}")
-            return action_result.set_status(phantom.APP_ERROR, f"Error finding devices by hostname: {str(e)}")
+            return action_result.set_status(
+                phantom.APP_ERROR, f"Error finding devices by hostname: {str(e)}"
+            )
 
     def _handle_update_device_impl(self, action: AutomoxAction):
         """
@@ -715,7 +855,9 @@ class AutomoxConnector(BaseConnector):
         json_body = json.dumps(body)
 
         # make rest call
-        ret_val, response = self._make_rest_call(endpoint, action_result, data=json_body, headers=self._headers, method="put")
+        ret_val, response = self._make_rest_call(
+            endpoint, action_result, data=json_body, headers=self._headers, method="put"
+        )
 
         if phantom.is_fail(ret_val):
             return action_result.get_status()
@@ -744,11 +886,16 @@ class AutomoxConnector(BaseConnector):
         user_id = action.params.get_path_param_by_key("user_id")
 
         if user_id:
-            ret_val, users = self._make_rest_call(endpoint, action_result, method="get", headers=self._headers)
+            ret_val, users = self._make_rest_call(
+                endpoint, action_result, method="get", headers=self._headers
+            )
             users = [users] if ret_val == phantom.APP_SUCCESS else []
         else:
             ret_val, users = self._fetch_paginated_data(
-                endpoint=endpoint, params=action.params, action_result=action_result, headers=self._headers
+                endpoint=endpoint,
+                params=action.params,
+                action_result=action_result,
+                headers=self._headers,
             )
 
         if phantom.is_fail(ret_val):
@@ -768,7 +915,10 @@ class AutomoxConnector(BaseConnector):
 
             # Format RBAC roles if present
             if "rbac_roles" in user and user["rbac_roles"]:
-                role_info = [f"{role['name']} ({role['organization_id']})" for role in user["rbac_roles"]]
+                role_info = [
+                    f"{role['name']} ({role['organization_id']})"
+                    for role in user["rbac_roles"]
+                ]
                 formatted_user["rbac_roles_formatted"] = ", ".join(role_info)
 
             if "tags" in user and user["tags"]:
@@ -798,12 +948,18 @@ class AutomoxConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(action.params.to_dict()))
         endpoint = self._get_endpoint(action)
 
-        device_id = action.params.get_aux_param_by_key("device_id")  # Get device_id from aux params
+        device_id = action.params.get_aux_param_by_key(
+            "device_id"
+        )  # Get device_id from aux params
 
         body = {"action": "remediateAll", "serverId": device_id}
 
         ret_val, response = self._make_rest_call(
-            endpoint=endpoint, action_result=action_result, data=json.dumps(body), headers=self._headers, method="post"
+            endpoint=endpoint,
+            action_result=action_result,
+            data=json.dumps(body),
+            headers=self._headers,
+            method="post",
         )
 
         if phantom.is_fail(ret_val):
@@ -1181,7 +1337,6 @@ if __name__ == "__main__":
     verify = args.verify
 
     if username and not password:
-
         # User specified a username but not a password, so ask
         import getpass
 
