@@ -20,7 +20,7 @@
     ],
     "license": "Copyright (c) Automox, 2025",
     "app_version": "1.0.0",
-    "utctime_updated": "2025-01-16T15:26:24.042220Z",
+    "utctime_updated": "2025-06-09T17:52:36.204087Z",
     "package_name": "phantom_automox",
     "main_module": "automox_connector.py",
     "min_phantom_version": "6.3.1.178",
