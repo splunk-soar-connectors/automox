@@ -82,13 +82,13 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 
 DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
 --------- | ---- | -------- | --------------
-action_result.parameter.query_params.o | numeric | `org id` | 123456 |
-action_result.parameter.aux_params.device_id | numeric | `device id` | 123456 |
-action_result.parameter.path_params.policy_id | numeric | `policy id` | 123456 |
 action_result.status | string | | |
 action_result.message | string | | |
 summary.total_objects | numeric | | |
 summary.total_objects_successful | numeric | | |
+action_result.parameter.org_id | numeric | `org id` | |
+action_result.parameter.device_id | numeric | `device id` | |
+action_result.parameter.policy_id | numeric | `policy id` | |
 
 ## action: 'list policies'
 
@@ -109,7 +109,6 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 
 DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
 --------- | ---- | -------- | --------------
-action_result.parameter.query_params.o | numeric | `org id` | 123456 |
 action_result.data.\*.\*.id | numeric | `policy id` | 123456 |
 action_result.data.\*.\*.uuid | string | | 8cbea739-abaf-49b3-9400-ad75390d7845 |
 action_result.data.\*.\*.name | string | | Apply All Patches |
@@ -120,6 +119,7 @@ action_result.status | string | | |
 action_result.message | string | | |
 summary.total_objects | numeric | | |
 summary.total_objects_successful | numeric | | |
+action_result.parameter.org_id | numeric | `org id` | |
 
 ## action: 'get policy'
 
@@ -141,8 +141,6 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 
 DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
 --------- | ---- | -------- | --------------
-action_result.parameter.query_params.o | numeric | `org id` | 123456 |
-action_result.parameter.path_params.policy_id | numeric | `policy id` | 123456 |
 action_result.data.\*.id | numeric | `policy id` | 123456 |
 action_result.data.\*.uuid | string | | 8cbea739-abaf-49b3-9400-ad75390d7845 |
 action_result.data.\*.name | string | | Apply All Patches |
@@ -153,6 +151,8 @@ action_result.status | string | | |
 action_result.message | string | | |
 summary.total_objects | numeric | | |
 summary.total_objects_successful | numeric | | |
+action_result.parameter.org_id | numeric | `org id` | |
+action_result.parameter.policy_id | numeric | `policy id` | |
 
 ## action: 'list devices'
 
@@ -173,7 +173,6 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 
 DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
 --------- | ---- | -------- | --------------
-action_result.parameter.query_params.o | string | `org id` | 123456 |
 action_result.data.\*.\*.id | numeric | `device id` | 123456 |
 action_result.data.\*.\*.uuid | string | | 8cbea739-abaf-49b3-9400-ad75390d7845 |
 action_result.data.\*.\*.name | string | `host name` | SERVER01 |
@@ -189,6 +188,7 @@ action_result.status | string | | |
 action_result.message | string | | |
 summary.total_objects | numeric | | |
 summary.total_objects_successful | numeric | | |
+action_result.parameter.org_id | numeric | `org id` | |
 
 ## action: 'list organizations'
 
@@ -238,8 +238,6 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 
 DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
 --------- | ---- | -------- | --------------
-action_result.parameter.aux_params.device_id | numeric | `device id` | 123456 |
-action_result.parameter.query_params.o | numeric | `org id` | 123456 |
 action_result.data.\*.\*.create_time | string | | 2023-10-10T15:19:53+0000 |
 action_result.data.\*.\*.name | string | | KB4052623 NotepadPlusPlus_64 a32ca1d0-ddd4-486b-b708-d941db4fb4aa {ACA17529-C1C0-41AE-8D8A-BAD5FD55FDE1} |
 action_result.data.\*.\*.display_name | string | | Update for Windows Defender Antivirus antimalware platform - KB4052623 NotepadPlusPlus Parallels Tools 2024-11 Update for Windows 11 Version 24H2 for ARM64-based Systems (KB5048779) |
@@ -258,6 +256,8 @@ action_result.status | string | | |
 action_result.message | string | | |
 summary.total_objects | numeric | | |
 summary.total_objects_successful | numeric | | |
+action_result.parameter.device_id | numeric | `device id` | |
+action_result.parameter.org_id | numeric | `org id` | |
 
 ## action: 'list software'
 
@@ -278,7 +278,6 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 
 DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
 --------- | ---- | -------- | --------------
-action_result.parameter.query_params.o | numeric | `org id` | 123456 |
 action_result.data.\*.\*.create_time | string | | 2023-10-10T15:19:53+0000 |
 action_result.data.\*.\*.name | string | | KB4052623 NotepadPlusPlus_64 a32ca1d0-ddd4-486b-b708-d941db4fb4aa {ACA17529-C1C0-41AE-8D8A-BAD5FD55FDE1} |
 action_result.data.\*.\*.display_name | string | | Update for Windows Defender Antivirus antimalware platform - KB4052623 NotepadPlusPlus Parallels Tools 2024-11 Update for Windows 11 Version 24H2 for ARM64-based Systems (KB5048779) |
@@ -297,6 +296,7 @@ action_result.status | string | | |
 action_result.message | string | | |
 summary.total_objects | numeric | | |
 summary.total_objects_successful | numeric | | |
+action_result.parameter.org_id | numeric | `org id` | |
 
 ## action: 'get device'
 
@@ -318,8 +318,6 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 
 DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
 --------- | ---- | -------- | --------------
-action_result.parameter.aux_params.device_id | numeric | `device id` | 123456 |
-action_result.parameter.query_params.o | numeric | `org id` | 123456 |
 action_result.data.\*.id | numeric | `device id` | 123456 |
 action_result.data.\*.uuid | string | | 8cbea739-abaf-49b3-9400-ad75390d7845 |
 action_result.data.\*.name | string | `host name` | SERVER01 |
@@ -335,6 +333,8 @@ action_result.status | string | | |
 action_result.message | string | | |
 summary.total_objects | numeric | | |
 summary.total_objects_successful | numeric | | |
+action_result.parameter.device_id | numeric | `device id` | |
+action_result.parameter.org_id | numeric | `org id` | |
 
 ## action: 'get device by hostname'
 
@@ -356,8 +356,6 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 
 DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
 --------- | ---- | -------- | --------------
-action_result.parameter.aux_params.hostname | string | `host name` | SERVER01 |
-action_result.parameter.query_params.o | numeric | `org id` | 123456 |
 action_result.data.\*.id | numeric | `device id` | 123456 |
 action_result.data.\*.uuid | string | | 8cbea739-abaf-49b3-9400-ad75390d7845 |
 action_result.data.\*.name | string | `host name` | SERVER01 |
@@ -373,6 +371,8 @@ action_result.status | string | | |
 action_result.message | string | | |
 summary.total_objects | numeric | | |
 summary.total_objects_successful | numeric | | |
+action_result.parameter.hostname | string | `host name` | |
+action_result.parameter.org_id | numeric | `org id` | |
 
 ## action: 'get organization user'
 
@@ -394,8 +394,6 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 
 DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
 --------- | ---- | -------- | --------------
-action_result.parameter.query_params.o | numeric | `org id` | 123456 |
-action_result.parameter.path_params.user_id | numeric | `user id` | 123456 |
 action_result.data.\*.id | numeric | `user id` | 123456 |
 action_result.data.\*.uuid | string | `user uuid` | 8cbea739-abaf-49b3-9400-ad75390d7845 |
 action_result.data.\*.name | string | | Jamie Doe |
@@ -410,6 +408,8 @@ action_result.status | string | | |
 action_result.message | string | | |
 summary.total_objects | numeric | | |
 summary.total_objects_successful | numeric | | |
+action_result.parameter.org_id | numeric | `org id` | |
+action_result.parameter.user_id | numeric | `user id` | |
 
 ## action: 'list organization users'
 
@@ -430,7 +430,6 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 
 DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
 --------- | ---- | -------- | --------------
-action_result.parameter.query_params.o | numeric | `org id` | 123456 |
 action_result.data.\*.id | numeric | `user id` | 123456 |
 action_result.data.\*.uuid | string | `user uuid` | 8cbea739-abaf-49b3-9400-ad75390d7845 |
 action_result.data.\*.name | string | | Jamie Doe |
@@ -445,6 +444,7 @@ action_result.status | string | | |
 action_result.message | string | | |
 summary.total_objects | numeric | | |
 summary.total_objects_successful | numeric | | |
+action_result.parameter.org_id | numeric | `org id` | |
 
 ## action: 'get device by ip address'
 
@@ -466,8 +466,6 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 
 DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
 --------- | ---- | -------- | --------------
-action_result.parameter.aux_params.ip_address | string | `ip` | 192.168.1.1 |
-action_result.parameter.query_params.o | numeric | `org id` | 123456 |
 action_result.data.\*.id | numeric | `device id` | 123456 |
 action_result.data.\*.uuid | string | | 8cbea739-abaf-49b3-9400-ad75390d7845 |
 action_result.data.\*.name | string | `host name` | SERVER01 |
@@ -483,6 +481,8 @@ action_result.status | string | | |
 action_result.message | string | | |
 summary.total_objects | numeric | | |
 summary.total_objects_successful | numeric | | |
+action_result.parameter.ip_address | string | `ip` | |
+action_result.parameter.org_id | numeric | `org id` | |
 
 ## action: 'list groups'
 
@@ -503,7 +503,6 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 
 DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
 --------- | ---- | -------- | --------------
-action_result.parameter.query_params.o | numeric | `org id` | 123456 |
 action_result.data.\*.\*.id | string | | 123456 |
 action_result.data.\*.\*.name | string | | My Group |
 action_result.data.\*.\*.organization_id | numeric | | 123456 |
@@ -513,6 +512,7 @@ action_result.status | string | | |
 action_result.message | string | | |
 summary.total_objects | numeric | | |
 summary.total_objects_successful | numeric | | |
+action_result.parameter.org_id | numeric | `org id` | |
 
 ## action: 'get command queues'
 
@@ -534,8 +534,6 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 
 DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
 --------- | ---- | -------- | --------------
-action_result.parameter.aux_params.device_id | numeric | `device id` | 123456 |
-action_result.parameter.query_params.o | numeric | `org id` | 123456 |
 action_result.data.\*.\*.id | numeric | | 123456789 |
 action_result.data.\*.\*.server_id | numeric | `device id` | 123456 |
 action_result.data.\*.\*.command_id | numeric | | 123456 null |
@@ -549,6 +547,8 @@ action_result.status | string | | |
 action_result.message | string | | |
 summary.total_objects | numeric | | |
 summary.total_objects_successful | numeric | | |
+action_result.parameter.device_id | numeric | `device id` | |
+action_result.parameter.org_id | numeric | `org id` | |
 
 ## action: 'remove user from account'
 
@@ -570,12 +570,12 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 
 DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
 --------- | ---- | -------- | --------------
-action_result.parameter.path_params.account_uuid | string | `account uuid` | 8cbea739-abaf-49b3-9400-ad75390d7845 |
-action_result.parameter.path_params.user_uuid | string | `user uuid` | 8cbea739-abaf-49b3-9400-ad75390d7845 |
 action_result.status | string | | |
 action_result.message | string | | |
 summary.total_objects | numeric | | |
 summary.total_objects_successful | numeric | | |
+action_result.parameter.account_uuid | string | `account uuid` | |
+action_result.parameter.user_uuid | string | `user uuid` | |
 
 ## action: 'update device'
 
@@ -601,16 +601,16 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 
 DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
 --------- | ---- | -------- | --------------
-action_result.parameter.aux_params.device_id | numeric | `device id` | 123456 |
-action_result.parameter.query_params.o | numeric | `org id` | 123456 |
-action_result.parameter.aux_params.exception | boolean | | true false |
-action_result.parameter.aux_params.server_group_id | numeric | `server group id` | 123456 |
-action_result.parameter.aux_params.tags | string | `tags` | tag1, tag2 tag1 |
-action_result.parameter.aux_params.custom_name | string | `custom name` | My Server |
 action_result.status | string | | |
 action_result.message | string | | |
 summary.total_objects | numeric | | |
 summary.total_objects_successful | numeric | | |
+action_result.parameter.device_id | numeric | `device id` | |
+action_result.parameter.org_id | numeric | `org id` | |
+action_result.parameter.exception | boolean | | |
+action_result.parameter.server_group_id | numeric | `server group id` | |
+action_result.parameter.tags | string | `tags` | |
+action_result.parameter.custom_name | string | `custom name` | |
 
 ## action: 'delete device'
 
@@ -632,12 +632,12 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 
 DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
 --------- | ---- | -------- | --------------
-action_result.parameter.aux_params.device_id | numeric | `device id` | 123456 |
-action_result.parameter.query_params.o | numeric | `org id` | 123456 |
 action_result.status | string | | |
 action_result.message | string | | |
 summary.total_objects | numeric | | |
 summary.total_objects_successful | numeric | | |
+action_result.parameter.device_id | numeric | `device id` | |
+action_result.parameter.org_id | numeric | `org id` | |
 
 ______________________________________________________________________
 
