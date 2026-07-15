@@ -18,7 +18,7 @@
             "name": "Cody Dietz"
         }
     ],
-    "license": "Copyright (c) Automox, 2025",
+    "license": "Copyright (c) Automox, 2025-2026",
     "app_version": "1.0.0",
     "utctime_updated": "2025-06-09T17:52:36.204087Z",
     "package_name": "phantom_automox",
@@ -41,6 +41,15 @@
             "order": 1,
             "name": "page_limit",
             "id": 1
+        },
+        "verify_server_cert": {
+            "description": "Verify the TLS certificate presented by the Automox server",
+            "data_type": "boolean",
+            "default": true,
+            "required": false,
+            "order": 2,
+            "name": "verify_server_cert",
+            "id": 2
         }
     },
     "actions": [
