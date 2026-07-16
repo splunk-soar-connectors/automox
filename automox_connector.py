@@ -1,6 +1,6 @@
 # File: automox_connector.py
 #
-# Copyright (c) Automox, 2025
+# Copyright (c) Automox, 2025-2026
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -427,7 +427,7 @@ class AutomoxConnector(BaseConnector):
         try:
             r = request_func(
                 url,
-                verify=config.get("verify_server_cert", False),
+                verify=config.get("verify_server_cert", True),
                 headers=headers,
                 **kwargs,
             )

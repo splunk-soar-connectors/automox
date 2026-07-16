@@ -1,1 +1,3 @@
 **Unreleased**
+
+* Added configurable TLS certificate verification, enabled by default.
