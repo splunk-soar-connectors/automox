@@ -1,7 +1,7 @@
 # Automox
 
 Publisher: Automox <br>
-Connector Version: 1.0.0 <br>
+Connector Version: 2.0.0 <br>
 Product Vendor: Automox <br>
 Product Name: Automox <br>
 Minimum Product Version: 6.3.1.178
